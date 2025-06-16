@@ -214,8 +214,8 @@
         
         async function initializeAppLogic() {
             try {
-                setStatus('connecting', 'A autenticar...');
                 if (!auth.currentUser) {
+                    setStatus('connecting', 'A autenticar...');
                     const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                     if (token) {
                         await signInWithCustomToken(auth, token);
@@ -231,13 +231,17 @@
 
                 unsubscribe = onSnapshot(dbRef, async (docSnap) => {
                     document.getElementById('loading-overlay').style.display = 'none';
-                    if (docSnap.exists() && docSnap.data().data && Object.keys(docSnap.data().data).length > 0) {
-                        setStatus('connected');
-                        renderState(docSnap.data());
-                    } else {
+                    let currentData = docSnap.exists() ? docSnap.data() : null;
+                    
+                    if (!currentData || !currentData.data || Object.keys(currentData.data).length === 0) {
                         setStatus('saving', 'A restaurar lista...');
+                        // Se não houver dados, cria com o estado padrão
                         await setDoc(dbRef, { data: defaultState });
-                        // O onSnapshot tratará da nova renderização automaticamente
+                        // A renderização ocorrerá no próximo snapshot que o setDoc irá acionar
+                    } else {
+                        // Se houver dados, renderiza
+                        setStatus('connected');
+                        renderState(currentData);
                     }
                 }, (error) => {
                     console.error("Firebase listener error:", error);
@@ -252,17 +256,14 @@
         }
 
         function renderState(state) {
-            let receivedData = state.data;
-            if (!receivedData || Object.keys(receivedData).length === 0) {
-                 receivedData = defaultState;
-            }
+            const data = (state && state.data) ? state.data : defaultState;
 
             for (const sectionId in defaultState) {
                 const section = document.getElementById(sectionId);
                 if (section) {
                     const list = section.querySelector('ul');
                     list.innerHTML = '';
-                    const itemsData = receivedData[sectionId] || defaultState[sectionId];
+                    const itemsData = data[sectionId] || defaultState[sectionId];
                     itemsData.forEach(itemData => {
                         const newItem = createNewListItem(itemData.text, itemData.checked);
                         list.appendChild(newItem);
