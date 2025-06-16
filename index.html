@@ -237,6 +237,7 @@
                     } else {
                         setStatus('saving', 'A restaurar lista...');
                         await setDoc(dbRef, { data: defaultState });
+                        // O onSnapshot tratará da nova renderização automaticamente
                     }
                 }, (error) => {
                     console.error("Firebase listener error:", error);
