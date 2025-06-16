@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icone-obori.jpg">
+    <meta name="theme-color" content="#A7D8DE">
+    <title>Camarinha Obori - Maio/2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F2E8; 
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23BDE0E1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .checklist-item input:checked + span { text-decoration: line-through; color: #6b7280; }
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
+        .editable-span { cursor: text; flex-grow: 1; padding: 4px 8px; border-radius: 6px; }
+        .editable-span:hover { background-color: #eef8f9; }
+        .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
+        .card { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .main-title { color: #0E4249; }
+        .subtitle { color: #3E6064; }
+        .progress-bar-main { background-color: #5daeb5; }
+        .progress-bg-main { background-color: #cbeef1; }
+        .progress-text-main { color: #0E4249; }
+        .section-title { color: #0E4249; border-bottom-color: #cbeef1; }
+        .checkbox-color { color: #257b84; }
+        .add-button { background-color: #257b84; color: white; transition: background-color 0.2s; }
+        .add-button:hover { background-color: #1a6d77; }
+        .add-input { border-color: #cbeef1; }
+        .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
+        .install-button { background-color: #0E4249; }
+        .install-button:hover { background-color: #1a6d77; }
+        .install-instructions { background-color: #f0fafb; border-color: #cbeef1; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(245, 242, 232, 0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        #status-container { position: fixed; bottom: 10px; right: 10px; display: flex; align-items: center; padding: 8px 12px; background-color: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000; }
+        #status-indicator { width: 12px; height: 12px; border-radius: 50%; transition: background-color 0.5s; }
+        #status-text { margin-left: 8px; font-size: 14px; font-weight: 500; color: #3E6064; }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div id="loading-overlay"></div>
+    <div id="status-container">
+        <div id="status-indicator" class="bg-yellow-400"></div>
+        <p id="status-text">A ligar...</p>
+    </div>
+
+    <div class="max-w-4xl mx-auto card p-6 rounded-2xl shadow-xl">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold main-title">Camarinha Obori - Maio/2026</h1>
+            <p class="subtitle mt-2">Adicione, edite e marque seus itens. Sincronizado em tempo real.</p>
+        </div>
+
+        <!-- Barra de Progresso Principal -->
+        <div class="mb-8">
+            <div class="flex justify-between mb-1">
+                <span class="text-base font-medium progress-text-main">Progresso Geral (Itens Rituais)</span>
+                <span id="progress-percentage" class="text-sm font-medium progress-text-main">0%</span>
+            </div>
+            <div class="w-full progress-bg-main rounded-full h-4">
+                <div id="progress-bar-fill" class="progress-bar-main h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <!-- As seções serão preenchidas dinamicamente pelo JavaScript -->
+            <div id="roupas-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Roupas Necessárias</h2>
+                <ul class="space-y-3"></ul>
+                <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+
+            <div id="materiais-section" class="card p-6 rounded-xl shadow-md">
+                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Materiais Adicionais</h2>
+                <ul class="space-y-3"></ul>
+                <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+            
+            <div id="cachoeira-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Cachoeira</h2>
+                <ul class="space-y-3"></ul>
+                <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+
+            <div id="pade-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Padê de Segunda Feira (Exu e Bombo Gira)</h2>
+                <ul class="space-y-3"></ul>
+                <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+            
+            <div id="oxala-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Comida de Oxalá</h2>
+                <ul class="space-y-3"></ul>
+                 <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+
+            <div id="bebidas-section" class="card p-6 rounded-xl shadow-md">
+                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Bebidas</h2>
+                <ul class="space-y-3"></ul>
+                <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+
+            <div id="rancho-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Rancho da Semana</h2>
+                <div class="mb-6 mt-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium progress-text-main">Progresso do Rancho</span>
+                        <span id="rancho-progress-percentage" class="text-sm font-medium progress-text-main">0%</span>
+                    </div>
+                    <div class="w-full progress-bg-main rounded-full h-4">
+                        <div id="rancho-progress-bar-fill" class="progress-bar-main h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <ul class="space-y-3"></ul>
+                 <div class="mt-4 flex">
+                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
+                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão e Instruções de Instalação -->
+        <div class="text-center mt-10">
+            <button id="install-guide-button" class="install-button text-white font-bold py-2 px-6 rounded-lg transition-colors">Como Instalar o App?</button>
+            <div id="install-instructions" class="hidden mt-4 text-left p-4 install-instructions rounded-lg max-w-2xl mx-auto">
+                 <h3 class="font-bold text-lg main-title">Para adicionar à sua tela de início:</h3>
+                <p class="mt-2 subtitle"><strong>No Android (Chrome):</strong></p>
+                <ol class="list-decimal list-inside ml-4 subtitle">
+                    <li>Toque nos três pontos no canto superior direito do navegador.</li>
+                    <li>Selecione a opção "Instalar aplicativo" ou "Adicionar à tela inicial".</li>
+                </ol>
+                <p class="mt-4 subtitle"><strong>No iPhone (Safari):</strong></p>
+                <ol class="list-decimal list-inside ml-4 subtitle">
+                    <li>Toque no ícone de Compartilhamento (o quadrado com uma seta para cima).</li>
+                    <li>Role para baixo e selecione a opção "Adicionar à Tela de Início".</li>
+                    <li>Confirme tocando em "Adicionar".</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let dbRef;
+        let unsubscribe;
+        let isSaving = false;
+        let debounceTimer;
+
+        const defaultState = {
+            "roupas-section": [ { text: "04 lenços brancos", checked: false }, { text: "03 fronhas brancas", checked: false }, { text: "04 lenços brancos 80 x 80", checked: false }, { text: "05 cuecas ou calcinhas brancas", checked: false }, { text: "02 sutiãs", checked: false }, { text: "01 traje completo para saída de branco", checked: false }, { text: "01 boné", checked: false }, { text: "04 toalhinhas para o branco", checked: false }, { text: "01 quipá para saída ou turbante (feminino)", checked: false }, { text: "01 chinelo branco", checked: false }, { text: "02 jalecos ou camisetas brancas", checked: false }, { text: "02 calças brancas", checked: false }, { text: "02 lenços pequenos para tapar os olhos", checked: false }, { text: "01 punhal para coração", checked: false }, { text: "05 panos de 1 metro", checked: false }, { text: "02 suporte para vela sete dias", checked: false }, { text: "01 alguidar médio vidro para guias", checked: false }, { text: "Criação: 1 pombo branco", checked: false }, { text: "Guia para Pai e Mãe de conforme o Santo", checked: false }, { text: "Guia de Preto Velho e Oxosse", checked: false } ],
+            "materiais-section": [ { text: "01 quartinha de barro (20 cm)", checked: false }, { text: "03 copos grandes de vidro", checked: false }, { text: "01 prato branco", checked: false }, { text: "01 colher", checked: false }, { text: "01 xícara com pires branco", checked: false }, { text: "01 prato barba", checked: false }, { text: "01 defumador espiritual", checked: false }, { text: "01 esteira", checked: false }, { text: "03 maços de vela nº 5", checked: false }, { text: "03 caixas de lamparinas São Jorge", checked: false }, { text: "01 caixa vela de sete dias", checked: false }, { text: "08 latas de óleo", checked: false }, { text: "01 sabão de coco", checked: false }, { text: "01 semente de obi", checked: false }, { text: "01 semente de orobô", checked: false }, { text: "01 pacote de banha de ori", checked: false }, { text: "01 vidro de mel grande", checked: false }, { text: "01 caixa de vela grande", checked: false }, { text: "01 pente branco", checked: false } ],
+            "cachoeira-section": [ { text: "21 unid. de quiabo", checked: false }, { text: "1 pote de mel", checked: false }, { text: "1 sabão de coco", checked: false }, { text: "4 ovos branco", checked: false } ],
+            "pade-section": [ { text: "2 bifes grandes sem passar na máquina", checked: false }, { text: "1 vidro azeite de dendê", checked: false }, { text: "2 alguidares médio vidrado", checked: false }, { text: "1 kg de farinha de mandioca", checked: false }, { text: "7 cebolas roxas", checked: false }, { text: "5 limões", checked: false }, { text: "1 charuto para Exu", checked: false }, { text: "1 cápsula pimenta da costa", checked: false } ],
+            "oxala-section": [ { text: "1 cacho de uva Itália bem bonito", checked: false }, { text: "1 pacote de canjica", checked: false }, { text: "1 champanhe de Oxalá", checked: false }, { text: "5 velas de cera grande", checked: false }, { text: "5 ramos de trigo", checked: false }, { text: "Coco ralado", checked: false } ],
+            "bebidas-section": [ { text: "1 cachaça para Exu", checked: false }, { text: "1 copo de vidro para Exu", checked: false }, { text: "1 champanhe para Pombo Gira", checked: false }, { text: "1 taça para Pombo Gira", checked: false }, { text: "2 velas de 7 dias", checked: false }, { text: "2 caixas de fósforo", checked: false }, { text: "3 cigarros para Pombo Gira", checked: false } ],
+            "rancho-section": [ { text: "2 kg de arroz amarelo", checked: false }, { text: "1 kg de arroz branco", checked: false }, { text: "2 kg de feijão", checked: false }, { text: "1 kg de macarrão", checked: false }, { text: "2 kg de açúcar", checked: false }, { text: "1 kg de canjica", checked: false }, { text: "1 pacote de sal", checked: false }, { text: "1 kg de fubá", checked: false }, { text: "1 kg de sal", checked: false }, { text: "1 litro de azeite (ou 1 unid.)", checked: false }, { text: "1 bandeja de ovos (30 unid.)", checked: false }, { text: "3 queijos ralados", checked: false }, { text: "1 leite condensado", checked: false }, { text: "1 cacho de banana", checked: false }, { text: "1 refrigerante", checked: false }, { text: "1 pacote papel toalha", checked: false }, { text: "2 pacotes coco ralado 100g cada", checked: false }, { text: "1 massa de tomate Elefante média", checked: false }, { text: "1 vidro de leite de coco", checked: false }, { text: "10 sucos", checked: false }, { text: "1 sardinha", checked: false }, { text: "1 creme de leite", checked: false }, { text: "1 extrato de tomate", checked: false }, { text: "1 maionese", checked: false }, { text: "2 garrafas de 51", checked: false }, { text: "1 margarina Qualy", checked: false }, { text: "1 frango grande", checked: false }, { text: "400g de polvilho", checked: false }, { text: "1 caldo de frango grande", checked: false }, { text: "2 kg de carne moída", checked: false }, { text: "2 kg de bife", checked: false }, { text: "2 kg de carne para assar de panela", checked: false }, { text: "1 pct costela com osso serrada", checked: false }, { text: "1 pct de linguiça caseira", checked: false }, { text: "1 kg de linguiça para churrasco", checked: false }, { text: "1 pct de peito de frango", checked: false }, { text: "1 kg de amendoim sem casca", checked: false }, { text: "2 kg de açúcar", checked: false }, { text: "1 kg de farinha de trigo", checked: false }, { text: "1 pct de pão", checked: false }, { text: "3 pães de chão", checked: false }, { text: "3 papéis alumínio", checked: false }, { text: "3 detergentes de 2 litros", checked: false }, { text: "2 esponjas para louça", checked: false }, { text: "1 pacote de fósforo", checked: false }, { text: "1 sabonete", checked: false }, { text: "1 papel higiênico", checked: false }, { text: "1 pct de algodão", checked: false }, { text: "1 pct de absorvente (30 unidades)", checked: false }, { text: "1 desinfetante de louça", checked: false }, { text: "1 sabão São Jorge (ou Pombo, Brilhante ou outro)", checked: false }, { text: "2 caixas de fósforo", checked: false }, { text: "1 caixa de sabão", checked: false }, { text: "1 caixa de fósforo", checked: false }, { text: "1 creme de cabelo", checked: false }, { text: "1 condimento", checked: false }, { text: "1 pct de alho", checked: false }, { text: "2 kg de feijão fradinho", checked: false }, { text: "20 bombons de arê", checked: false }, { text: "20 copos descartáveis 300 ml", checked: false }, { text: "10 garrafas divididas entre os detetados", checked: false }, { text: "10 unidades de gás dividido entre os detetados", checked: false } ]
+        };
+        
+        function setStatus(status, message) {
+            const indicator = document.getElementById('status-indicator');
+            const text = document.getElementById('status-text');
+            switch (status) {
+                case 'connecting':
+                    indicator.className = 'w-3 h-3 rounded-full bg-yellow-400';
+                    text.textContent = message || 'A ligar...';
+                    break;
+                case 'connected':
+                    indicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                    text.textContent = message || 'Sincronizado';
+                    break;
+                case 'error':
+                    indicator.className = 'w-3 h-3 rounded-full bg-red-500';
+                    text.textContent = message || 'Erro de ligação';
+                    break;
+                case 'saving':
+                     indicator.className = 'w-3 h-3 rounded-full bg-blue-500';
+                     text.textContent = message || 'A guardar...';
+                     break;
+            }
+        }
+        
+        async function signInAndInitialize() {
+            try {
+                if (!auth.currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                }
+                
+                dbRef = doc(db, "artifacts", appId, "public/data/lista_obori", "state");
+                
+                if (unsubscribe) unsubscribe();
+
+                const docSnap = await getDoc(dbRef);
+
+                if (!docSnap.exists()) {
+                    await setDoc(dbRef, { data: defaultState });
+                }
+
+                unsubscribe = onSnapshot(dbRef, (doc) => {
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    setStatus('connected');
+                    if(doc.exists()) {
+                        renderState(doc.data());
+                    }
+                }, (error) => {
+                    console.error("Firebase listener error:", error);
+                    setStatus('error', 'Erro de sincronização');
+                });
+
+            } catch (error) {
+                console.error("Authentication or initialization failed:", error);
+                setStatus('error', 'Falha na ligação');
+            }
+        }
+
+        function renderState(state) {
+            if (!state || !state.data) {
+                state = { data: defaultState };
+            }
+            const data = state.data;
+            for (const sectionId in defaultState) {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const list = section.querySelector('ul');
+                    list.innerHTML = '';
+                    const itemsData = data[sectionId] || defaultState[sectionId];
+                    itemsData.forEach(itemData => {
+                        const newItem = createNewListItem(itemData.text, itemData.checked);
+                        list.appendChild(newItem);
+                    });
+                }
+            }
+            updateAllProgress();
+        }
+        
+        function debouncedSave() {
+             if (isSaving) return;
+             clearTimeout(debounceTimer);
+             setStatus('saving');
+             debounceTimer = setTimeout(async () => {
+                 isSaving = true;
+                 await saveState();
+                 isSaving = false;
+                 setStatus('connected');
+             }, 1000);
+        }
+
+        async function saveState() {
+            if (!auth.currentUser) return;
+            const currentState = {};
+            document.querySelectorAll('.space-y-8 > div').forEach(section => {
+                const sectionId = section.id;
+                if (!sectionId) return;
+                
+                const items = [];
+                section.querySelectorAll('.checklist-item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const span = item.querySelector('span.editable-span');
+                    items.push({ text: span.textContent, checked: checkbox.checked });
+                });
+                currentState[sectionId] = items;
+            });
+            
+            if (dbRef) {
+                try {
+                    await setDoc(dbRef, { data: currentState }, { merge: true });
+                } catch (error) {
+                    console.error("Erro ao guardar o estado: ", error);
+                    setStatus('error', 'Falha ao guardar');
+                }
+            }
+        }
+
+        function createNewListItem(text, checked = false) {
+            const li = document.createElement('li');
+            li.className = 'checklist-item flex items-center';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = checked;
+            checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
+            const span = document.createElement('span');
+            span.contentEditable = 'true';
+            span.className = 'text-gray-800 ml-3 editable-span';
+            span.textContent = text;
+            li.appendChild(checkbox);
+            li.appendChild(span);
+            attachEventListeners(li);
+            return li;
+        }
+
+        function attachEventListeners(listItem) {
+            listItem.querySelector('input[type="checkbox"]').addEventListener('change', debouncedSave);
+            listItem.querySelector('span.editable-span').addEventListener('blur', debouncedSave);
+        }
+        
+        function updateAllProgress() {
+            const mainCheckboxes = document.querySelectorAll('#roupas-section input[type="checkbox"], #materiais-section input[type="checkbox"], #cachoeira-section input[type="checkbox"], #pade-section input[type="checkbox"], #oxala-section input[type="checkbox"], #bebidas-section input[type="checkbox"]');
+            const checkedMainItems = document.querySelectorAll('#roupas-section input:checked, #materiais-section input:checked, #cachoeira-section input:checked, #pade-section input:checked, #oxala-section input:checked, #bebidas-section input:checked');
+            const mainPercentage = mainCheckboxes.length > 0 ? (checkedMainItems.length / mainCheckboxes.length) * 100 : 0;
+            document.getElementById('progress-bar-fill').style.width = mainPercentage + '%';
+            document.getElementById('progress-percentage').textContent = Math.round(mainPercentage) + '%';
+            
+            const ranchoCheckboxes = document.querySelectorAll('#rancho-section input[type="checkbox"]');
+            const checkedRanchoItems = document.querySelectorAll('#rancho-section input[type="checkbox"]:checked');
+            const ranchoPercentage = ranchoCheckboxes.length > 0 ? (checkedRanchoItems.length / ranchoCheckboxes.length) * 100 : 0;
+            document.getElementById('rancho-progress-bar-fill').style.width = ranchoPercentage + '%';
+            document.getElementById('rancho-progress-percentage').textContent = Math.round(ranchoPercentage) + '%';
+        }
+
+        document.querySelectorAll('.add-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const text = input.value.trim();
+                if (text) {
+                    const list = this.closest('.card').querySelector('ul');
+                    const newItem = createNewListItem(text);
+                    list.appendChild(newItem);
+                    input.value = '';
+                    debouncedSave();
+                }
+            });
+        });
+
+        document.getElementById('install-guide-button').addEventListener('click', () => {
+            document.getElementById('install-instructions').classList.toggle('hidden');
+        });
+
+        signInAndInitialize();
+    </script>
+</body>
+</html>
