@@ -228,17 +228,15 @@
                 
                 if (unsubscribe) unsubscribe();
 
-                const docSnap = await getDoc(dbRef);
-
-                if (!docSnap.exists() || !docSnap.data().data) {
-                    await setDoc(dbRef, { data: defaultState });
-                }
-
-                unsubscribe = onSnapshot(dbRef, (doc) => {
+                unsubscribe = onSnapshot(dbRef, async (docSnap) => {
                     document.getElementById('loading-overlay').style.display = 'none';
-                    setStatus('connected');
-                    if(doc.exists()) {
-                        renderState(doc.data());
+                    if (docSnap.exists() && docSnap.data().data && Object.keys(docSnap.data().data).length > 0) {
+                        setStatus('connected');
+                        renderState(docSnap.data());
+                    } else {
+                        setStatus('saving', 'A restaurar lista...');
+                        await setDoc(dbRef, { data: defaultState });
+                        // O onSnapshot tratará da renderização
                     }
                 }, (error) => {
                     console.error("Firebase listener error:", error);
@@ -248,7 +246,7 @@
             } catch (error) {
                 console.error("Authentication or initialization failed:", error);
                 setStatus('error', 'Falha na ligação');
-                 document.getElementById('loading-overlay').style.display = 'none';
+                document.getElementById('loading-overlay').style.display = 'none';
             }
         }
 
