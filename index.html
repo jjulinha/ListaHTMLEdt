@@ -35,24 +35,14 @@
         .install-button { background-color: #0E4249; }
         .install-button:hover { background-color: #1a6d77; }
         .install-instructions { background-color: #f0fafb; border-color: #cbeef1; }
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(245, 242, 232, 0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        #status-container { position: fixed; bottom: 10px; right: 10px; display: flex; align-items: center; padding: 8px 12px; background-color: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 10000; }
-        #status-indicator { width: 12px; height: 12px; border-radius: 50%; transition: background-color 0.5s; }
-        #status-text { margin-left: 8px; font-size: 14px; font-weight: 500; color: #3E6064; }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
 
-    <div id="loading-overlay"></div>
-    <div id="status-container">
-        <div id="status-indicator" class="bg-yellow-400"></div>
-        <p id="status-text">A ligar...</p>
-    </div>
-
     <div class="max-w-4xl mx-auto card p-6 rounded-2xl shadow-xl">
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold main-title">Camarinha Obori - Maio/2026</h1>
-            <p class="subtitle mt-2">Adicione, edite e marque seus itens. Sincronizado em tempo real.</p>
+            <p class="subtitle mt-2">Adicione, edite e marque seus itens. Salvo no seu dispositivo.</p>
         </div>
 
         <!-- Barra de Progresso Principal -->
@@ -67,7 +57,7 @@
         </div>
 
         <div class="space-y-8">
-            <!-- As seções serão preenchidas dinamicamente pelo JavaScript -->
+            <!-- Categoria: Roupas Necessárias -->
             <div id="roupas-section" class="card p-6 rounded-xl shadow-md">
                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Roupas Necessárias</h2>
                 <ul class="space-y-3"></ul>
@@ -161,209 +151,134 @@
         </div>
     </div>
     
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        let dbRef;
-        let unsubscribe;
-        let isSaving = false;
-        let debounceTimer;
-
-        const defaultState = {
-            "roupas-section": [ { "text": "04 lenços brancos", "checked": false }, { "text": "03 fronhas brancas", "checked": false }, { "text": "04 lenços brancos 80 x 80", "checked": false }, { "text": "05 cuecas ou calcinhas brancas", "checked": false }, { "text": "02 sutiãs", "checked": false }, { "text": "01 traje completo para saída de branco", "checked": false }, { "text": "01 boné", "checked": false }, { "text": "04 toalhinhas para o branco", "checked": false }, { "text": "01 quipá para saída ou turbante (feminino)", "checked": false }, { "text": "01 chinelo branco", "checked": false }, { "text": "02 jalecos ou camisetas brancas", "checked": false }, { "text": "02 calças brancas", "checked": false }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false }, { "text": "01 punhal para coração", "checked": false }, { "text": "05 panos de 1 metro", "checked": false }, { "text": "02 suporte para vela sete dias", "checked": false }, { "text": "01 alguidar médio vidro para guias", "checked": false }, { "text": "Criação: 1 pombo branco", "checked": false }, { "text": "Guia para Pai e Mãe de conforme o Santo", "checked": false }, { "text": "Guia de Preto Velho e Oxosse", "checked": false } ],
-            "materiais-section": [ { "text": "01 quartinha de barro (20 cm)", "checked": false }, { "text": "03 copos grandes de vidro", "checked": false }, { "text": "01 prato branco", "checked": false }, { "text": "01 colher", "checked": false }, { "text": "01 xícara com pires branco", "checked": false }, { "text": "01 prato barba", "checked": false }, { "text": "01 defumador espiritual", "checked": false }, { "text": "01 esteira", "checked": false }, { "text": "03 maços de vela nº 5", "checked": false }, { "text": "03 caixas de lamparinas São Jorge", "checked": false }, { "text": "01 caixa vela de sete dias", "checked": false }, { "text": "08 latas de óleo", "checked": false }, { "text": "01 sabão de coco", "checked": false }, { "text": "01 semente de obi", "checked": false }, { "text": "01 semente de orobô", "checked": false }, { "text": "01 pacote de banha de ori", "checked": false }, { "text": "01 vidro de mel grande", "checked": false }, { "text": "01 caixa de vela grande", "checked": false }, { "text": "01 pente branco", "checked": false } ],
-            "cachoeira-section": [ { "text": "21 unid. de quiabo", "checked": false }, { "text": "1 pote de mel", "checked": false }, { "text": "1 sabão de coco", "checked": false }, { "text": "4 ovos branco", "checked": false } ],
-            "pade-section": [ { "text": "2 bifes grandes sem passar na máquina", "checked": false }, { "text": "1 vidro azeite de dendê", "checked": false }, { "text": "2 alguidares médio vidrado", "checked": false }, { "text": "1 kg de farinha de mandioca", "checked": false }, { "text": "7 cebolas roxas", "checked": false }, { "text": "5 limões", "checked": false }, { "text": "1 charuto para Exu", "checked": false }, { "text": "1 cápsula pimenta da costa", "checked": false } ],
-            "oxala-section": [ { "text": "1 cacho de uva Itália bem bonito", "checked": false }, { "text": "1 pacote de canjica", "checked": false }, { "text": "1 champanhe de Oxalá", "checked": false }, { "text": "5 velas de cera grande", "checked": false }, { "text": "5 ramos de trigo", "checked": false }, { "text": "Coco ralado", "checked": false } ],
-            "bebidas-section": [ { "text": "1 cachaça para Exu", "checked": false }, { "text": "1 copo de vidro para Exu", "checked": false }, { "text": "1 champanhe para Pombo Gira", "checked": false }, { "text": "1 taça para Pombo Gira", "checked": false }, { "text": "2 velas de 7 dias", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "3 cigarros para Pombo Gira", "checked": false } ],
-            "rancho-section": [ { "text": "2 kg de arroz amarelo", "checked": false }, { "text": "1 kg de arroz branco", "checked": false }, { "text": "2 kg de feijão", "checked": false }, { "text": "1 kg de macarrão", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de canjica", "checked": false }, { "text": "1 pacote de sal", "checked": false }, { "text": "1 kg de fubá", "checked": false }, { "text": "1 kg de sal", "checked": false }, { "text": "1 litro de azeite (ou 1 unid.)", "checked": false }, { "text": "1 bandeja de ovos (30 unid.)", "checked": false }, { "text": "3 queijos ralados", "checked": false }, { "text": "1 leite condensado", "checked": false }, { "text": "1 cacho de banana", "checked": false }, { "text": "1 refrigerante", "checked": false }, { "text": "1 pacote papel toalha", "checked": false }, { "text": "2 pacotes coco ralado 100g cada", "checked": false }, { "text": "1 massa de tomate Elefante média", "checked": false }, { "text": "1 vidro de leite de coco", "checked": false }, { "text": "10 sucos", "checked": false }, { "text": "1 sardinha", "checked": false }, { "text": "1 creme de leite", "checked": false }, { "text": "1 extrato de tomate", "checked": false }, { "text": "1 maionese", "checked": false }, { "text": "2 garrafas de 51", "checked": false }, { "text": "1 margarina Qualy", "checked": false }, { "text": "1 frango grande", "checked": false }, { "text": "400g de polvilho", "checked": false }, { "text": "1 caldo de frango grande", "checked": false }, { "text": "2 kg de carne moída", "checked": false }, { "text": "2 kg de bife", "checked": false }, { "text": "2 kg de carne para assar de panela", "checked": false }, { "text": "1 pct costela com osso serrada", "checked": false }, { "text": "1 pct de linguiça caseira", "checked": false }, { "text": "1 kg de linguiça para churrasco", "checked": false }, { "text": "1 pct de peito de frango", "checked": false }, { "text": "1 kg de amendoim sem casca", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de farinha de trigo", "checked": false }, { "text": "1 pct de pão", "checked": false }, { "text": "3 pães de chão", "checked": false }, { "text": "3 papéis alumínio", "checked": false }, { "text": "3 detergentes de 2 litros", "checked": false }, { "text": "2 esponjas para louça", "checked": false }, { "text": "1 pacote de fósforo", "checked": false }, { "text": "1 sabonete", "checked": false }, { "text": "1 papel higiênico", "checked": false }, { "text": "1 pct de algodão", "checked": false }, { "text": "1 pct de absorvente (30 unidades)", "checked": false }, { "text": "1 desinfetante de louça", "checked": false }, { "text": "1 sabão São Jorge (ou Pombo, Brilhante ou outro)", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "1 caixa de sabão", "checked": false }, { "text": "1 caixa de fósforo", "checked": false }, { "text": "1 creme de cabelo", "checked": false }, { "text": "1 condimento", "checked": false }, { "text": "1 pct de alho", "checked": false }, { "text": "2 kg de feijão fradinho", "checked": false }, { "text": "20 bombons de arê", "checked": false }, { "text": "20 copos descartáveis 300 ml", "checked": false }, { "text": "10 garrafas divididas entre os detetados", "checked": false }, { "text": "10 unidades de gás dividido entre os detetados", "checked": false } ]
-        };
-        
-        function setStatus(status, message) {
-            const indicator = document.getElementById('status-indicator');
-            const text = document.getElementById('status-text');
-            switch (status) {
-                case 'connecting':
-                    indicator.className = 'w-3 h-3 rounded-full bg-yellow-400';
-                    text.textContent = message || 'A ligar...';
-                    break;
-                case 'connected':
-                    indicator.className = 'w-3 h-3 rounded-full bg-green-500';
-                    text.textContent = message || 'Sincronizado';
-                    break;
-                case 'error':
-                    indicator.className = 'w-3 h-3 rounded-full bg-red-500';
-                    text.textContent = message || 'Erro de ligação';
-                    break;
-                case 'saving':
-                     indicator.className = 'w-3 h-3 rounded-full bg-blue-500';
-                     text.textContent = message || 'A guardar...';
-                     break;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const storageKey = 'camarinhaOboriState-vLocal'; 
+            
+            // FIX: Only register Service Worker on secure origins (https or localhost)
+            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+                navigator.serviceWorker.register('sw.js').catch(err => console.error("Service Worker registration failed:", err));
             }
-        }
-        
-        async function initializeAppLogic() {
-            try {
-                if (!auth.currentUser) {
-                    setStatus('connecting', 'A autenticar...');
-                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    if (token) {
-                        await signInWithCustomToken(auth, token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                }
-                
-                setStatus('connecting', 'A ligar à base de dados...');
-                dbRef = doc(db, "artifacts", appId, "public/data/lista_obori", "state");
 
-                if (unsubscribe) unsubscribe();
+            const defaultState = {
+                "roupas-section": [ { "text": "04 lenços brancos", "checked": false }, { "text": "03 fronhas brancas", "checked": false }, { "text": "04 lenços brancos 80 x 80", "checked": false }, { "text": "05 cuecas ou calcinhas brancas", "checked": false }, { "text": "02 sutiãs", "checked": false }, { "text": "01 traje completo para saída de branco", "checked": false }, { "text": "01 boné", "checked": false }, { "text": "04 toalhinhas para o branco", "checked": false }, { "text": "01 quipá para saída ou turbante (feminino)", "checked": false }, { "text": "01 chinelo branco", "checked": false }, { "text": "02 jalecos ou camisetas brancas", "checked": false }, { "text": "02 calças brancas", "checked": false }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false }, { "text": "01 punhal para coração", "checked": false }, { "text": "05 panos de 1 metro", "checked": false }, { "text": "02 suporte para vela sete dias", "checked": false }, { "text": "01 alguidar médio vidro para guias", "checked": false }, { "text": "Criação: 1 pombo branco", "checked": false }, { "text": "Guia para Pai e Mãe de conforme o Santo", "checked": false }, { "text": "Guia de Preto Velho e Oxosse", "checked": false } ],
+                "materiais-section": [ { "text": "01 quartinha de barro (20 cm)", "checked": false }, { "text": "03 copos grandes de vidro", "checked": false }, { "text": "01 prato branco", "checked": false }, { "text": "01 colher", "checked": false }, { "text": "01 xícara com pires branco", "checked": false }, { "text": "01 prato barba", "checked": false }, { "text": "01 defumador espiritual", "checked": false }, { "text": "01 esteira", "checked": false }, { "text": "03 maços de vela nº 5", "checked": false }, { "text": "03 caixas de lamparinas São Jorge", "checked": false }, { "text": "01 caixa vela de sete dias", "checked": false }, { "text": "08 latas de óleo", "checked": false }, { "text": "01 sabão de coco", "checked": false }, { "text": "01 semente de obi", "checked": false }, { "text": "01 semente de orobô", "checked": false }, { "text": "01 pacote de banha de ori", "checked": false }, { "text": "01 vidro de mel grande", "checked": false }, { "text": "01 caixa de vela grande", "checked": false }, { "text": "01 pente branco", "checked": false } ],
+                "cachoeira-section": [ { "text": "21 unid. de quiabo", "checked": false }, { "text": "1 pote de mel", "checked": false }, { "text": "1 sabão de coco", "checked": false }, { "text": "4 ovos branco", "checked": false } ],
+                "pade-section": [ { "text": "2 bifes grandes sem passar na máquina", "checked": false }, { "text": "1 vidro azeite de dendê", "checked": false }, { "text": "2 alguidares médio vidrado", "checked": false }, { "text": "1 kg de farinha de mandioca", "checked": false }, { "text": "7 cebolas roxas", "checked": false }, { "text": "5 limões", "checked": false }, { "text": "1 charuto para Exu", "checked": false }, { "text": "1 cápsula pimenta da costa", "checked": false } ],
+                "oxala-section": [ { "text": "1 cacho de uva Itália bem bonito", "checked": false }, { "text": "1 pacote de canjica", "checked": false }, { "text": "1 champanhe de Oxalá", "checked": false }, { "text": "5 velas de cera grande", "checked": false }, { "text": "5 ramos de trigo", "checked": false }, { "text": "Coco ralado", "checked": false } ],
+                "bebidas-section": [ { "text": "1 cachaça para Exu", "checked": false }, { "text": "1 copo de vidro para Exu", "checked": false }, { "text": "1 champanhe para Pombo Gira", "checked": false }, { "text": "1 taça para Pombo Gira", "checked": false }, { "text": "2 velas de 7 dias", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "3 cigarros para Pombo Gira", "checked": false } ],
+                "rancho-section": [ { "text": "2 kg de arroz amarelo", "checked": false }, { "text": "1 kg de arroz branco", "checked": false }, { "text": "2 kg de feijão", "checked": false }, { "text": "1 kg de macarrão", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de canjica", "checked": false }, { "text": "1 pacote de sal", "checked": false }, { "text": "1 kg de fubá", "checked": false }, { "text": "1 kg de sal", "checked": false }, { "text": "1 litro de azeite (ou 1 unid.)", "checked": false }, { "text": "1 bandeja de ovos (30 unid.)", "checked": false }, { "text": "3 queijos ralados", "checked": false }, { "text": "1 leite condensado", "checked": false }, { "text": "1 cacho de banana", "checked": false }, { "text": "1 refrigerante", "checked": false }, { "text": "1 pacote papel toalha", "checked": false }, { "text": "2 pacotes coco ralado 100g cada", "checked": false }, { "text": "1 massa de tomate Elefante média", "checked": false }, { "text": "1 vidro de leite de coco", "checked": false }, { "text": "10 sucos", "checked": false }, { "text": "1 sardinha", "checked": false }, { "text": "1 creme de leite", "checked": false }, { "text": "1 extrato de tomate", "checked": false }, { "text": "1 maionese", "checked": false }, { "text": "2 garrafas de 51", "checked": false }, { "text": "1 margarina Qualy", "checked": false }, { "text": "1 frango grande", "checked": false }, { "text": "400g de polvilho", "checked": false }, { "text": "1 caldo de frango grande", "checked": false }, { "text": "2 kg de carne moída", "checked": false }, { "text": "2 kg de bife", "checked": false }, { "text": "2 kg de carne para assar de panela", "checked": false }, { "text": "1 pct costela com osso serrada", "checked": false }, { "text": "1 pct de linguiça caseira", "checked": false }, { "text": "1 kg de linguiça para churrasco", "checked": false }, { "text": "1 pct de peito de frango", "checked": false }, { "text": "1 kg de amendoim sem casca", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de farinha de trigo", "checked": false }, { "text": "1 pct de pão", "checked": false }, { "text": "3 pães de chão", "checked": false }, { "text": "3 papéis alumínio", "checked": false }, { "text": "3 detergentes de 2 litros", "checked": false }, { "text": "2 esponjas para louça", "checked": false }, { "text": "1 pacote de fósforo", "checked": false }, { "text": "1 sabonete", "checked": false }, { "text": "1 papel higiênico", "checked": false }, { "text": "1 pct de algodão", "checked": false }, { "text": "1 pct de absorvente (30 unidades)", "checked": false }, { "text": "1 desinfetante de louça", "checked": false }, { "text": "1 sabão São Jorge (ou Pombo, Brilhante ou outro)", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "1 caixa de sabão", "checked": false }, { "text": "1 caixa de fósforo", "checked": false }, { "text": "1 creme de cabelo", "checked": false }, { "text": "1 condimento", "checked": false }, { "text": "1 pct de alho", "checked": false }, { "text": "2 kg de feijão fradinho", "checked": false }, { "text": "20 bombons de arê", "checked": false }, { "text": "20 copos descartáveis 300 ml", "checked": false }, { "text": "10 garrafas divididas entre os detetados", "checked": false }, { "text": "10 unidades de gás dividido entre os detetados", "checked": false } ]
+            };
 
-                unsubscribe = onSnapshot(dbRef, async (docSnap) => {
-                    document.getElementById('loading-overlay').style.display = 'none';
-                    let currentData = docSnap.exists() ? docSnap.data() : null;
-                    
-                    if (!currentData || !currentData.data || Object.keys(currentData.data).length === 0) {
-                        setStatus('saving', 'A restaurar lista...');
-                        // Se não houver dados, cria com o estado padrão
-                        await setDoc(dbRef, { data: defaultState });
-                        // A renderização ocorrerá no próximo snapshot que o setDoc irá acionar
-                    } else {
-                        // Se houver dados, renderiza
-                        setStatus('connected');
-                        renderState(currentData);
-                    }
-                }, (error) => {
-                    console.error("Firebase listener error:", error);
-                    setStatus('error', 'Erro de sincronização');
-                });
-
-            } catch (error) {
-                console.error("Authentication or initialization failed:", error);
-                setStatus('error', 'Falha na ligação');
-                document.getElementById('loading-overlay').style.display = 'none';
-            }
-        }
-
-        function renderState(state) {
-            const data = (state && state.data) ? state.data : defaultState;
-
-            for (const sectionId in defaultState) {
-                const section = document.getElementById(sectionId);
-                if (section) {
-                    const list = section.querySelector('ul');
-                    list.innerHTML = '';
-                    const itemsData = data[sectionId] || defaultState[sectionId];
-                    itemsData.forEach(itemData => {
-                        const newItem = createNewListItem(itemData.text, itemData.checked);
-                        list.appendChild(newItem);
+            function saveState() {
+                const currentState = {};
+                document.querySelectorAll('.space-y-8 > div[id]').forEach(section => {
+                    const sectionId = section.id;
+                    const items = [];
+                    section.querySelectorAll('.checklist-item').forEach(item => {
+                        const checkbox = item.querySelector('input[type="checkbox"]');
+                        const span = item.querySelector('span.editable-span');
+                        items.push({ text: span.textContent, checked: checkbox.checked });
                     });
-                }
-            }
-            updateAllProgress();
-        }
-        
-        function debouncedSave() {
-             if (isSaving) return;
-             clearTimeout(debounceTimer);
-             setStatus('saving');
-             debounceTimer = setTimeout(async () => {
-                 isSaving = true;
-                 await saveState();
-                 isSaving = false;
-                 setStatus('connected');
-             }, 1000);
-        }
-
-        async function saveState() {
-            if (!auth.currentUser) return;
-            const currentState = {};
-            document.querySelectorAll('.space-y-8 > div[id]').forEach(section => {
-                const sectionId = section.id;
-                const items = [];
-                section.querySelectorAll('.checklist-item').forEach(item => {
-                    const checkbox = item.querySelector('input[type="checkbox"]');
-                    const span = item.querySelector('span.editable-span');
-                    items.push({ text: span.textContent, checked: checkbox.checked });
+                    currentState[sectionId] = items;
                 });
-                currentState[sectionId] = items;
-            });
-            
-            if (dbRef) {
-                try {
-                    await setDoc(dbRef, { data: currentState }, { merge: true });
-                } catch (error) {
-                    console.error("Erro ao guardar o estado: ", error);
-                    setStatus('error', 'Falha ao guardar');
-                }
+                localStorage.setItem(storageKey, JSON.stringify(currentState));
             }
-        }
 
-        function createNewListItem(text, checked = false) {
-            const li = document.createElement('li');
-            li.className = 'checklist-item flex items-center';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = checked;
-            checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
-            const span = document.createElement('span');
-            span.contentEditable = 'true';
-            span.className = 'text-gray-800 ml-3 editable-span';
-            span.textContent = text;
-            li.appendChild(checkbox);
-            li.appendChild(span);
-            attachEventListeners(li);
-            return li;
-        }
-
-        function attachEventListeners(listItem) {
-            listItem.querySelector('input[type="checkbox"]').addEventListener('change', debouncedSave);
-            listItem.querySelector('span.editable-span').addEventListener('blur', debouncedSave);
-        }
-        
-        function updateAllProgress() {
-            const mainCheckboxes = document.querySelectorAll('#roupas-section input[type="checkbox"], #materiais-section input[type="checkbox"], #cachoeira-section input[type="checkbox"], #pade-section input[type="checkbox"], #oxala-section input[type="checkbox"], #bebidas-section input[type="checkbox"]');
-            const checkedMainItems = document.querySelectorAll('#roupas-section input:checked, #materiais-section input:checked, #cachoeira-section input:checked, #pade-section input:checked, #oxala-section input:checked, #bebidas-section input:checked');
-            const mainPercentage = mainCheckboxes.length > 0 ? (checkedMainItems.length / mainCheckboxes.length) * 100 : 0;
-            document.getElementById('progress-bar-fill').style.width = mainPercentage + '%';
-            document.getElementById('progress-percentage').textContent = Math.round(mainPercentage) + '%';
-            
-            const ranchoCheckboxes = document.querySelectorAll('#rancho-section input[type="checkbox"]');
-            const checkedRanchoItems = document.querySelectorAll('#rancho-section input[type="checkbox"]:checked');
-            const ranchoPercentage = ranchoCheckboxes.length > 0 ? (checkedRanchoItems.length / ranchoCheckboxes.length) * 100 : 0;
-            document.getElementById('rancho-progress-bar-fill').style.width = ranchoPercentage + '%';
-            document.getElementById('rancho-progress-percentage').textContent = Math.round(ranchoPercentage) + '%';
-        }
-
-        document.querySelectorAll('.add-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const input = this.previousElementSibling;
-                const text = input.value.trim();
-                if (text) {
-                    const list = this.closest('.card').querySelector('ul');
-                    const newItem = createNewListItem(text);
-                    list.appendChild(newItem);
-                    input.value = '';
-                    debouncedSave();
+            function loadState() {
+                const savedStateJSON = localStorage.getItem(storageKey);
+                let stateToRender = defaultState;
+                if (savedStateJSON) {
+                    try {
+                        const parsedState = JSON.parse(savedStateJSON);
+                        // Verifica se o estado guardado não está vazio
+                        if (parsedState && Object.keys(parsedState).length > 0) {
+                            stateToRender = parsedState;
+                        }
+                    } catch (e) {
+                        console.error("Error parsing saved state:", e);
+                    }
                 }
+                renderState(stateToRender);
+            }
+
+            function renderState(state) {
+                for (const sectionId in state) {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const list = section.querySelector('ul');
+                        list.innerHTML = ''; 
+                        const itemsData = state[sectionId] || [];
+                        itemsData.forEach(itemData => {
+                            const newItem = createNewListItem(itemData.text, itemData.checked);
+                            list.appendChild(newItem);
+                        });
+                    }
+                }
+                updateAllProgress();
+            }
+
+            function createNewListItem(text, checked = false) {
+                const li = document.createElement('li');
+                li.className = 'checklist-item flex items-center';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = checked;
+                checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
+                const span = document.createElement('span');
+                span.contentEditable = 'true';
+                span.className = 'text-gray-800 ml-3 editable-span';
+                span.textContent = text;
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                attachEventListeners(li);
+                return li;
+            }
+
+            function attachEventListeners(listItem) {
+                listItem.querySelector('input[type="checkbox"]').addEventListener('change', () => {
+                    saveState();
+                    updateAllProgress();
+                });
+                listItem.querySelector('span.editable-span').addEventListener('blur', saveState);
+            }
+            
+            function updateAllProgress() {
+                const mainCheckboxes = document.querySelectorAll('#roupas-section input, #materiais-section input, #cachoeira-section input, #pade-section input, #oxala-section input, #bebidas-section input');
+                const checkedMainItems = document.querySelectorAll('#roupas-section input:checked, #materiais-section input:checked, #cachoeira-section input:checked, #pade-section input:checked, #oxala-section input:checked, #bebidas-section input:checked');
+                const mainPercentage = mainCheckboxes.length > 0 ? (checkedMainItems.length / mainCheckboxes.length) * 100 : 0;
+                document.getElementById('progress-bar-fill').style.width = mainPercentage + '%';
+                document.getElementById('progress-percentage').textContent = Math.round(mainPercentage) + '%';
+                
+                const ranchoCheckboxes = document.querySelectorAll('#rancho-section input[type="checkbox"]');
+                const checkedRanchoItems = document.querySelectorAll('#rancho-section input[type="checkbox"]:checked');
+                const ranchoPercentage = ranchoCheckboxes.length > 0 ? (checkedRanchoItems.length / ranchoCheckboxes.length) * 100 : 0;
+                document.getElementById('rancho-progress-bar-fill').style.width = ranchoPercentage + '%';
+                document.getElementById('rancho-progress-percentage').textContent = Math.round(ranchoPercentage) + '%';
+            }
+
+            document.querySelectorAll('.add-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    const text = input.value.trim();
+                    if (text) {
+                        const list = this.closest('.card').querySelector('ul');
+                        const newItem = createNewListItem(text);
+                        list.appendChild(newItem);
+                        input.value = '';
+                        saveState();
+                        updateAllProgress();
+                    }
+                });
             });
-        });
 
-        document.getElementById('install-guide-button').addEventListener('click', () => {
-            document.getElementById('install-instructions').classList.toggle('hidden');
-        });
+            document.getElementById('install-guide-button').addEventListener('click', () => {
+                document.getElementById('install-instructions').classList.toggle('hidden');
+            });
 
-        initializeAppLogic();
+            // --- Inicialização ---
+            loadState();
+        });
     </script>
 </body>
 </html>
