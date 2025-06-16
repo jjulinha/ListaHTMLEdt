@@ -215,6 +215,7 @@
         async function signInAndInitialize() {
             try {
                 if (!auth.currentUser) {
+                    setStatus('connecting', 'A autenticar...');
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
@@ -222,6 +223,7 @@
                     }
                 }
                 
+                setStatus('connecting', 'A carregar dados...');
                 dbRef = doc(db, "artifacts", appId, "public/data/lista_obori", "state");
                 
                 if (unsubscribe) unsubscribe();
@@ -246,6 +248,7 @@
             } catch (error) {
                 console.error("Authentication or initialization failed:", error);
                 setStatus('error', 'Falha na ligação');
+                 document.getElementById('loading-overlay').style.display = 'none';
             }
         }
 
