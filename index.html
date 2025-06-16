@@ -212,20 +212,21 @@
             }
         }
         
-        async function signInAndInitialize() {
+        async function initializeAppLogic() {
             try {
+                setStatus('connecting', 'A autenticar...');
                 if (!auth.currentUser) {
-                    setStatus('connecting', 'A autenticar...');
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
+                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (token) {
+                        await signInWithCustomToken(auth, token);
                     } else {
                         await signInAnonymously(auth);
                     }
                 }
                 
-                setStatus('connecting', 'A carregar dados...');
+                setStatus('connecting', 'A ligar à base de dados...');
                 dbRef = doc(db, "artifacts", appId, "public/data/lista_obori", "state");
-                
+
                 if (unsubscribe) unsubscribe();
 
                 unsubscribe = onSnapshot(dbRef, async (docSnap) => {
@@ -236,7 +237,6 @@
                     } else {
                         setStatus('saving', 'A restaurar lista...');
                         await setDoc(dbRef, { data: defaultState });
-                        // O onSnapshot tratará da renderização
                     }
                 }, (error) => {
                     console.error("Firebase listener error:", error);
@@ -251,16 +251,17 @@
         }
 
         function renderState(state) {
-            if (!state || !state.data) {
-                state = { data: defaultState };
+            let receivedData = state.data;
+            if (!receivedData || Object.keys(receivedData).length === 0) {
+                 receivedData = defaultState;
             }
-            const data = state.data;
+
             for (const sectionId in defaultState) {
                 const section = document.getElementById(sectionId);
                 if (section) {
                     const list = section.querySelector('ul');
                     list.innerHTML = '';
-                    const itemsData = data[sectionId] || defaultState[sectionId];
+                    const itemsData = receivedData[sectionId] || defaultState[sectionId];
                     itemsData.forEach(itemData => {
                         const newItem = createNewListItem(itemData.text, itemData.checked);
                         list.appendChild(newItem);
@@ -285,10 +286,8 @@
         async function saveState() {
             if (!auth.currentUser) return;
             const currentState = {};
-            document.querySelectorAll('.space-y-8 > div').forEach(section => {
+            document.querySelectorAll('.space-y-8 > div[id]').forEach(section => {
                 const sectionId = section.id;
-                if (!sectionId) return;
-                
                 const items = [];
                 section.querySelectorAll('.checklist-item').forEach(item => {
                     const checkbox = item.querySelector('input[type="checkbox"]');
@@ -362,7 +361,7 @@
             document.getElementById('install-instructions').classList.toggle('hidden');
         });
 
-        signInAndInitialize();
+        initializeAppLogic();
     </script>
 </body>
 </html>
