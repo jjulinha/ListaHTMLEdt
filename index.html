@@ -58,22 +58,20 @@
     </div>
 
     <div class="mt-8 bg-green-100 p-4 rounded-lg space-y-2">
-        <div class="flex justify-between font-semibold text-sm sm:text-base">
-            <span>Custo Itens Rituais:</span>
-            <span id="total-rituais">R$ 0,00</span>
+        <div class="grid grid-cols-2 gap-x-4">
+            <span class="font-semibold text-sm sm:text-base text-left">Custo Itens Rituais:</span>
+            <span id="total-rituais" class="font-semibold text-sm sm:text-base text-right">R$ 0,00</span>
+            
+            <span class="font-semibold text-sm sm:text-base text-left">Custo Rancho:</span>
+            <span id="total-rancho" class="font-semibold text-sm sm:text-base text-right">R$ 0,00</span>
         </div>
-         <div class="flex justify-between font-semibold text-sm sm:text-base">
-            <span>Custo Rancho:</span>
-            <span id="total-rancho">R$ 0,00</span>
-        </div>
-        <hr class="border-t-2 border-green-300">
-        <div class="flex justify-between font-bold text-lg sm:text-xl">
-            <span>CUSTO TOTAL:</span>
-            <span id="total-geral">R$ 0,00</span>
-        </div>
-        <div class="flex justify-between font-bold text-lg sm:text-xl text-blue-600">
-            <span>TOTAL CONTRIBUIÇÃO (Ganhos):</span>
-            <span id="total-contribuicao">R$ 0,00</span>
+        <hr class="border-t-2 border-green-300 my-2">
+        <div class="grid grid-cols-2 gap-x-4">
+            <span class="font-bold text-lg sm:text-xl text-left">CUSTO TOTAL:</span>
+            <span id="total-geral" class="font-bold text-lg sm:text-xl text-right">R$ 0,00</span>
+            
+            <span class="font-bold text-lg sm:text-xl text-blue-600 text-left">TOTAL CONTRIBUIÇÃO:</span>
+            <span id="total-contribuicao" class="font-bold text-lg sm:text-xl text-blue-600 text-right">R$ 0,00</span>
         </div>
     </div>
 </div>
@@ -287,7 +285,6 @@ function createItemElement(sectionKey, item) {
     return li;
 }
 
-
 function renderAllSections() {
     const container = document.getElementById('sections-container');
     container.innerHTML = '';
@@ -401,13 +398,15 @@ function updateProgressBars() {
     if (mainProgressBar) mainProgressBar.style.width = `${mainPercentage}%`;
     if (mainProgressPercentage) mainProgressPercentage.textContent = `${Math.round(mainPercentage)}%`;
     
-    const ranchoItems = state.rancho.items;
-    const checkedRanchoItems = ranchoItems.filter(item => item.checked).length;
-    const ranchoPercentage = ranchoItems.length > 0 ? (checkedRanchoItems / ranchoItems.length) * 100 : 0;
-    const ranchoProgressBar = document.getElementById('rancho-progress-bar-fill');
-    const ranchoProgressPercentage = document.getElementById('rancho-progress-percentage');
-    if(ranchoProgressBar) ranchoProgressBar.style.width = `${ranchoPercentage}%`;
-    if(ranchoProgressPercentage) ranchoProgressPercentage.textContent = `${Math.round(ranchoPercentage)}%`;
+    if (state.rancho && state.rancho.items) {
+        const ranchoItems = state.rancho.items;
+        const checkedRanchoItems = ranchoItems.filter(item => item.checked).length;
+        const ranchoPercentage = ranchoItems.length > 0 ? (checkedRanchoItems / ranchoItems.length) * 100 : 0;
+        const ranchoProgressBar = document.getElementById('rancho-progress-bar-fill');
+        const ranchoProgressPercentage = document.getElementById('rancho-progress-percentage');
+        if(ranchoProgressBar) ranchoProgressBar.style.width = `${ranchoPercentage}%`;
+        if(ranchoProgressPercentage) ranchoProgressPercentage.textContent = `${Math.round(ranchoPercentage)}%`;
+    }
 }
 
 function updateTotalsAndSave() {
