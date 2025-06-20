@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icone-obori.jpg">
     <meta name="theme-color" content="#A7D8DE">
     <title>Camarinha Obori - Maio/2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,14 +13,14 @@
             background-color: #F5F2E8; 
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23BDE0E1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-        .checklist-item { display: flex; align-items: center; }
+        .checklist-item { display: flex; align-items: center; gap: 0.5rem; }
         .checklist-item input:checked + span { text-decoration: line-through; color: #6b7280; }
         .progress-bar-fill { transition: width 0.5s ease-in-out; }
         .editable-span { cursor: text; flex-grow: 1; padding: 4px 8px; border-radius: 6px; }
         .editable-span:hover { background-color: #eef8f9; }
         .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
         .price-input {
-            width: 80px;
+            width: 90px;
             margin-left: auto;
             text-align: right;
             padding: 4px 8px;
@@ -43,21 +41,9 @@
         .add-button:hover { background-color: #1a6d77; }
         .add-input { border-color: #cbeef1; }
         .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
-        .install-button { background-color: #0E4249; }
-        .install-button:hover { background-color: #1a6d77; }
-        .install-instructions { background-color: #f0fafb; border-color: #cbeef1; }
     </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
-
-    <!-- Molde (template) para cada item da lista. Fica escondido. -->
-    <template id="list-item-template">
-        <li class="checklist-item flex items-center gap-2">
-            <input type="checkbox" class="h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0">
-            <span contenteditable="true" class="text-gray-800 editable-span"></span>
-            <input type="number" class="price-input w-24 text-right p-1 rounded-md border-2 bg-transparent" placeholder="R$ 0,00" step="0.01" min="0">
-        </li>
-    </template>
 
     <div class="max-w-4xl mx-auto card p-6 rounded-2xl shadow-xl">
         <div class="text-center mb-8">
@@ -152,30 +138,11 @@
                 </div>
             </div>
         </div>
-
-        <!-- Botão e Instruções de Instalação -->
-        <div class="text-center mt-10">
-            <button id="install-guide-button" class="install-button text-white font-bold py-2 px-6 rounded-lg transition-colors">Como Instalar o App?</button>
-            <div id="install-instructions" class="hidden mt-4 text-left p-4 install-instructions rounded-lg max-w-2xl mx-auto">
-                 <h3 class="font-bold text-lg main-title">Para adicionar à sua tela de início:</h3>
-                <p class="mt-2 subtitle"><strong>No Android (Chrome):</strong></p>
-                <ol class="list-decimal list-inside ml-4 subtitle">
-                    <li>Toque nos três pontos no canto superior direito do navegador.</li>
-                    <li>Selecione a opção "Instalar aplicativo" ou "Adicionar à tela inicial".</li>
-                </ol>
-                <p class="mt-4 subtitle"><strong>No iPhone (Safari):</strong></p>
-                <ol class="list-decimal list-inside ml-4 subtitle">
-                    <li>Toque no ícone de Compartilhamento (o quadrado com uma seta para cima).</li>
-                    <li>Role para baixo e selecione a opção "Adicionar à Tela de Início".</li>
-                    <li>Confirme tocando em "Adicionar".</li>
-                </ol>
-            </div>
-        </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const storageKey = 'camarinhaOboriState-vLocalPrice-v5'; 
+            const storageKey = 'camarinhaOboriState-vLocalPrice-v7'; 
             
             const defaultState = {
                 "roupas-acessorios-section": [ { "text": "05 cuecas ou calcinhas brancas", "checked": false, "price": "" }, { "text": "04 lenços brancos", "checked": false, "price": "" }, { "text": "04 toalhinhas para o banco", "checked": false, "price": "" }, { "text": "04 lençóis brancos (80x80)", "checked": false, "price": "" }, { "text": "03 fronhas brancas", "checked": false, "price": "" }, { "text": "02 sutiãs", "checked": false, "price": "" }, { "text": "02 jalecos ou camisetas brancas", "checked": false, "price": "" }, { "text": "02 calças brancas", "checked": false, "price": "" }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false, "price": "" }, { "text": "01 traje completo para saída de branco", "checked": false, "price": "" }, { "text": "01 quepe para saída ou turbante", "checked": false, "price": "" }, { "text": "01 boné", "checked": false, "price": "" }, { "text": "01 chinelo branco", "checked": false, "price": "" }, { "text": "01 punhal para coração", "checked": false, "price": "" }, { "text": "01 pente branco", "checked": false, "price": "" } ],
@@ -206,8 +173,10 @@
                 let currentState;
                 try {
                     currentState = savedStateJSON ? JSON.parse(savedStateJSON) : null;
-                    if (currentState && typeof currentState !== 'object') {
-                        currentState = null;
+                    if (currentState && typeof currentState === 'object') {
+                        // Optional: Validate deeper if necessary
+                    } else {
+                       currentState = null; // Invalidate if not an object
                     }
                 } catch (e) {
                     console.error("Error parsing saved state:", e);
@@ -235,18 +204,31 @@
             }
 
             function createNewListItem(text, checked = false, price = "") {
-                const template = document.getElementById('list-item-template');
-                const clone = template.content.cloneNode(true);
-                const li = clone.querySelector('li');
-                
-                const checkbox = li.querySelector('input[type="checkbox"]');
-                const span = li.querySelector('span.editable-span');
-                const priceInput = li.querySelector('.price-input');
-                
+                const li = document.createElement('li');
+                li.className = 'checklist-item flex items-center gap-2';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
                 checkbox.checked = checked;
+                checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
+
+                const span = document.createElement('span');
+                span.contentEditable = 'true';
+                span.className = 'text-gray-800 editable-span';
                 span.textContent = text;
+
+                const priceInput = document.createElement('input');
+                priceInput.type = 'number';
+                priceInput.className = 'price-input w-24 text-right p-1 rounded-md border-2 bg-transparent';
+                priceInput.placeholder = 'R$ 0,00';
+                priceInput.step = '0.01';
+                priceInput.min = '0';
                 priceInput.value = price || '';
 
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                li.appendChild(priceInput);
+                
                 attachEventListeners(li);
                 return li;
             }
