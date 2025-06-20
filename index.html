@@ -50,6 +50,15 @@
 </head>
 <body class="p-4 sm:p-6 md:p-8">
 
+    <!-- Molde (template) para cada item da lista. Fica escondido. -->
+    <template id="list-item-template">
+        <li class="checklist-item flex items-center gap-2">
+            <input type="checkbox" class="h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0">
+            <span contenteditable="true" class="text-gray-800 editable-span"></span>
+            <input type="number" class="price-input w-24 text-right p-1 rounded-md border-2 bg-transparent" placeholder="R$ 0,00" step="0.01" min="0">
+        </li>
+    </template>
+
     <div class="max-w-4xl mx-auto card p-6 rounded-2xl shadow-xl">
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold main-title">Camarinha Obori - Maio/2026</h1>
@@ -166,15 +175,8 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const storageKey = 'camarinhaOboriState-vLocalPrice-v4'; 
+            const storageKey = 'camarinhaOboriState-vLocalPrice-v5'; 
             
-            // FIX: Register Service Worker by referencing the sw.js file
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service worker registered successfully:', reg))
-                    .catch(err => console.error('Service worker registration failed:', err));
-            }
-
             const defaultState = {
                 "roupas-acessorios-section": [ { "text": "05 cuecas ou calcinhas brancas", "checked": false, "price": "" }, { "text": "04 lenços brancos", "checked": false, "price": "" }, { "text": "04 toalhinhas para o banco", "checked": false, "price": "" }, { "text": "04 lençóis brancos (80x80)", "checked": false, "price": "" }, { "text": "03 fronhas brancas", "checked": false, "price": "" }, { "text": "02 sutiãs", "checked": false, "price": "" }, { "text": "02 jalecos ou camisetas brancas", "checked": false, "price": "" }, { "text": "02 calças brancas", "checked": false, "price": "" }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false, "price": "" }, { "text": "01 traje completo para saída de branco", "checked": false, "price": "" }, { "text": "01 quepe para saída ou turbante", "checked": false, "price": "" }, { "text": "01 boné", "checked": false, "price": "" }, { "text": "01 chinelo branco", "checked": false, "price": "" }, { "text": "01 punhal para coração", "checked": false, "price": "" }, { "text": "01 pente branco", "checked": false, "price": "" } ],
                 "rituais-oferendas-section": [ { "text": "07 Velas de Cera Grande", "checked": false, "price": "" }, { "text": "03 Alguidares Médios", "checked": false, "price": "" }, { "text": "02 potes/vidros de Mel", "checked": false, "price": "" }, { "text": "02 Sabões de Coco", "checked": false, "price": "" }, { "text": "01 Caixa e 02 Velas de 7 Dias", "checked": false, "price": "" }, { "text": "21 unidades de Quiabo", "checked": false, "price": "" }, { "text": "05 panos de 1 metro", "checked": false, "price": "" }, { "text": "05 limões", "checked": false, "price": "" }, { "text": "05 ramos de Trigo", "checked": false, "price": "" }, { "text": "04 ovos brancos", "checked": false, "price": "" }, { "text": "03 maços de vela nº 5", "checked": false, "price": "" }, { "text": "03 cigarros para Pompo Gira", "checked": false, "price": "" }, { "text": "02 suportes para vela sete dias", "checked": false, "price": "" }, { "text": "02 bifes grandes sem passar na máquina", "checked": false, "price": "" }, { "text": "01 vidro de azeite de Dendê", "checked": false, "price": "" }, { "text": "01 kg de farinha de mandioca", "checked": false, "price": "" }, { "text": "01 charruto para Exu", "checked": false, "price": "" }, { "text": "01 cápsula de pimenta da Costa", "checked": false, "price": "" }, { "text": "01 cacho de uva Itália", "checked": false, "price": "" }, { "text": "01 pacote de canjica", "checked": false, "price": "" }, { "text": "01 champanhe de Oxalá", "checked": false, "price": "" }, { "text": "01 cachaça para Exu", "checked": false, "price": "" }, { "text": "01 champanhe para Pompo Gira", "checked": false, "price": "" }, { "text": "01 taça para Pombo Gira", "checked": false, "price": "" }, { "text": "01 pacote de banha de Ori", "checked": false, "price": "" }, { "text": "01 defumador espiritual", "checked": false, "price": "" }, { "text": "01 semente de Obi", "checked": false, "price": "" }, { "text": "01 semente de Orobo", "checked": false, "price": "" }, { "text": "01 pemba branca", "checked": false, "price": "" }, { "text": "Coco ralado", "checked": false, "price": "" } ],
@@ -233,31 +235,18 @@
             }
 
             function createNewListItem(text, checked = false, price = "") {
-                const li = document.createElement('li');
-                li.className = 'checklist-item flex items-center gap-2';
+                const template = document.getElementById('list-item-template');
+                const clone = template.content.cloneNode(true);
+                const li = clone.querySelector('li');
                 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
+                const checkbox = li.querySelector('input[type="checkbox"]');
+                const span = li.querySelector('span.editable-span');
+                const priceInput = li.querySelector('.price-input');
+                
                 checkbox.checked = checked;
-                checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
-                
-                const span = document.createElement('span');
-                span.contentEditable = 'true';
-                span.className = 'text-gray-800 editable-span';
                 span.textContent = text;
-                
-                const priceInput = document.createElement('input');
-                priceInput.type = 'number';
-                priceInput.className = 'price-input w-24 text-right p-1 rounded-md border-2 bg-transparent';
-                priceInput.placeholder = 'R$ 0,00';
-                priceInput.step = '0.01';
-                priceInput.min = '0';
                 priceInput.value = price || '';
 
-                li.appendChild(checkbox);
-                li.appendChild(span);
-                li.appendChild(priceInput);
-                
                 attachEventListeners(li);
                 return li;
             }
