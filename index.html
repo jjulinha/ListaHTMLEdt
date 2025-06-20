@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Camarinha Obori - Maio/2026</title>
+  <title>Camarinha Obori - Checklist Sincronizado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
@@ -59,14 +59,31 @@
     </div>
   </div>
 
-  <!-- Configuração Firebase -->
+  <!-- Firebase Configuração -->
   <script src="firebase-config.js"></script>
 
-  <!-- Lógica do app -->
+  <!-- Lógica do App -->
   <script>
     const storageKey = 'controleItensV11';
     let state = {};
-    let defaultState = { /* aqui você cola o conteúdo de defaultState completo que já usamos */ };
+    let defaultState = {
+      sections: [
+        {
+          title: "Itens Rituais",
+          items: [
+            { name: "Vela Branca", required: true, cost: 5.00, done: false },
+            { name: "Incenso de Alecrim", required: true, cost: 3.50, done: false }
+          ]
+        },
+        {
+          title: "Rancho",
+          items: [
+            { name: "Arroz", required: false, cost: 2.00, done: false },
+            { name: "Feijão", required: false, cost: 4.00, done: false }
+          ]
+        }
+      ]
+    };
 
     function saveState() {
       localStorage.setItem(storageKey, JSON.stringify(state));
@@ -82,7 +99,7 @@
         const remoteState = snapshot.val();
         if (remoteState) {
           state = remoteState;
-          localStorage.setItem(storageKey, JSON.stringify(remoteState));
+          localStorage.setItem(storageKey, JSON.stringify(state));
           update();
         }
       });
@@ -93,12 +110,75 @@
     }
 
     function update() {
-      // renderAllSections() e updateTotalsAndSave() devem ser declaradas como já estavam
+      renderAllSections();
+      updateTotalsAndSave();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function renderAllSections() {
+      const container = document.getElementById("sections-container");
+      container.innerHTML = "";
+      state.sections.forEach((sec, si) => {
+        const secEl = document.createElement("div");
+        secEl.innerHTML = `
+          <h2 class="text-xl font-semibold text-[#0E4249] mb-2">${sec.title}</h2>
+          <ul class="space-y-2" id="section-${si}-list"></ul>
+        `;
+        container.appendChild(secEl);
+        sec.items.forEach((it, ii) => {
+          const ul = document.getElementById(`section-${si}-list`);
+          ul.appendChild(createItemElement(it, si, ii));
+        });
+      });
+      updateProgressBar();
+    }
+
+    function createItemElement(item, si, ii) {
+      const li = document.createElement("li");
+      li.className = "flex items-center justify-between";
+      li.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" id="chk-${si}-${ii}" ${item.done ? "checked" : ""} />
+          <label for="chk-${si}-${ii}" class="${item.required ? 'font-bold' : ''}">${item.name}</label>
+        </div>
+        <span>${formatCurrency(item.cost)}</span>
+      `;
+      li.querySelector("input").addEventListener("change", e => {
+        state.sections[si].items[ii].done = e.target.checked;
+        update();
+      });
+      return li;
+    }
+
+    function updateTotalsAndSave() {
+      let rituais = 0, rancho = 0, totalCont = 0;
+      state.sections.forEach(sec => {
+        sec.items.forEach(it => {
+          if (it.done) totalCont += it.cost;
+          if (sec.title.includes("Rituais")) rituais += it.cost;
+          if (sec.title.includes("Rancho")) rancho += it.cost;
+        });
+      });
+      document.getElementById("total-rituais").innerText = formatCurrency(rituais);
+      document.getElementById("total-rancho").innerText = formatCurrency(rancho);
+      document.getElementById("total-geral").innerText = formatCurrency(rituais + rancho);
+      document.getElementById("total-contribuicao").innerText = formatCurrency(totalCont);
+      saveState();
+    }
+
+    function updateProgressBar() {
+      const allItems = state.sections.flatMap(s => s.items);
+      const doneCount = allItems.filter(it => it.done).length;
+      const percent = allItems.length ? Math.round(doneCount / allItems.length * 100) : 0;
+      document.getElementById("main-progress-bar-fill").style.width = percent + "%";
+      document.getElementById("main-progress-percentage").innerText = percent + "%";
+    }
+
+    document.getElementById("install-guide-button").addEventListener("click", () => {
+      document.getElementById("install-instructions").classList.toggle("hidden");
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
       loadState();
-      update();
     });
   </script>
 </body>
