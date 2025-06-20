@@ -78,7 +78,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const storageKey = 'controleItensV11';
+    const storageKey = 'controleItensV12';
     let state = {};
 
     const defaultState = {
@@ -203,15 +203,13 @@ function loadState() {
         if (parsedState && typeof parsedState === 'object' && Object.keys(parsedState).length > 0) {
             state = parsedState;
         } else {
-            // Se não há estado salvo ou está corrompido, usa o padrão
-            state = JSON.parse(JSON.stringify(defaultState)); // Cópia profunda
+            state = JSON.parse(JSON.stringify(defaultState));
         }
     } catch (e) {
         console.error("Erro ao carregar o estado, a usar o estado padrão:", e);
-        state = JSON.parse(JSON.stringify(defaultState)); // Cópia profunda
+        state = JSON.parse(JSON.stringify(defaultState));
     }
 
-    // Garante que os preços são números e que todas as secções existem
     for (const sectionKey in defaultState) {
         if (!state[sectionKey] || !Array.isArray(state[sectionKey].items)) {
             state[sectionKey] = defaultState[sectionKey];
@@ -239,7 +237,7 @@ function createItemElement(sectionKey, item) {
     };
 
     const span = document.createElement('span');
-    span.contentEditable = 'true';
+    span.contentEditable = true;
     span.className = 'editable-span flex-grow ml-2';
     span.textContent = item.text;
     span.onblur = () => {
@@ -426,10 +424,11 @@ function update() {
     updateTotalsAndSave();
 }
 
-window.onload = () => {
-    loadState();
-    update();
-};
+// Initialize the app
+loadState();
+update();
+
+});
 </script>
 </body>
 </html>
