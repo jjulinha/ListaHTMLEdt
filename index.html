@@ -36,6 +36,9 @@
     .add-button:hover { background-color: #1a6d77; }
     .add-input { border-color: #cbeef1; }
     .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
+    .install-button { background-color: #0E4249; }
+    .install-button:hover { background-color: #1a6d77; }
+    .install-instructions { background-color: #f0fafb; border-color: #cbeef1; }
 </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
@@ -74,97 +77,117 @@
             <span id="total-contribuicao" class="font-bold text-lg sm:text-xl text-blue-600 text-right">R$ 0,00</span>
         </div>
     </div>
+
+    <!-- Botão e Instruções de Instalação -->
+    <div class="text-center mt-10">
+        <button id="install-guide-button" class="install-button text-white font-bold py-2 px-6 rounded-lg transition-colors">Como Instalar o App?</button>
+        <div id="install-instructions" class="hidden mt-4 text-left p-4 install-instructions rounded-lg max-w-2xl mx-auto">
+             <h3 class="font-bold text-lg main-title">Para adicionar à sua tela de início:</h3>
+            <p class="mt-2 subtitle"><strong>No Android (Chrome):</strong></p>
+            <ol class="list-decimal list-inside ml-4 subtitle">
+                <li>Toque nos três pontos no canto superior direito do navegador.</li>
+                <li>Selecione a opção "Instalar aplicativo" ou "Adicionar à tela inicial".</li>
+            </ol>
+            <p class="mt-4 subtitle"><strong>No iPhone (Safari):</strong></p>
+            <ol class="list-decimal list-inside ml-4 subtitle">
+                <li>Toque no ícone de Compartilhamento (o quadrado com uma seta para cima).</li>
+                <li>Role para baixo e selecione a opção "Adicionar à Tela de Início".</li>
+                <li>Confirme tocando em "Adicionar".</li>
+            </ol>
+        </div>
+    </div>
 </div>
 
 <script>
-const storageKey = 'controleItensV9';
-let state = {};
+document.addEventListener('DOMContentLoaded', function () {
+    const storageKey = 'controleItensV10';
+    let state = {};
 
-const defaultState = {
-    "roupas": {
-        title: "Roupas e Acessórios",
-        isRitual: true,
-        items: [
-            { text: '05 cuecas ou calcinhas brancas', checked: false, price: 0, ganho: false },
-            { text: '04 lenços brancos', checked: false, price: 0, ganho: false },
-            { text: '04 toalhinhas para o banco', checked: false, price: 0, ganho: false },
-            { text: '04 lençóis brancos (80x80)', checked: false, price: 0, ganho: false },
-            { text: '03 fronhas brancas', checked: false, price: 0, ganho: false },
-            { text: '02 sutiãs', checked: false, price: 0, ganho: false },
-            { text: '02 jalecos ou camisetas brancas', checked: false, price: 0, ganho: false },
-            { text: '02 calças brancas', checked: false, price: 0, ganho: false },
-            { text: '02 lenços pequenos para tapar os olhos', checked: false, price: 0, ganho: false },
-            { text: '01 traje completo para saída de branco', checked: false, price: 0, ganho: false },
-            { text: '01 quepe para saída ou turbante', checked: false, price: 0, ganho: false },
-            { text: '01 boné', checked: false, price: 0, ganho: false },
-            { text: '01 chinelo branco', checked: false, price: 0, ganho: false },
-            { text: '01 punhal para coração', checked: false, price: 0, ganho: false },
-            { text: '01 pente branco', checked: false, price: 0, ganho: false }
-        ]
-    },
-    "rituais": {
-        title: "Itens para Rituais e Oferendas",
-        isRitual: true,
-        items: [
-            { text: '07 Velas de Cera Grande', checked: false, price: 0, ganho: false },
-            { text: '03 Alguidares Médios', checked: false, price: 0, ganho: false },
-            { text: '02 potes/vidros de Mel', checked: false, price: 0, ganho: false },
-            { text: '02 Sabões de Coco', checked: false, price: 0, ganho: false },
-            { text: '01 Caixa e 02 Velas de 7 Dias', checked: false, price: 0, ganho: false },
-            { text: '21 unidades de Quiabo', checked: false, price: 0, ganho: false },
-            { text: '05 panos de 1 metro', checked: false, price: 0, ganho: false },
-            { text: '05 limões', checked: false, price: 0, ganho: false },
-            { text: '05 ramos de Trigo', checked: false, price: 0, ganho: false },
-            { text: '04 ovos brancos', checked: false, price: 0, ganho: false },
-            { text: '03 maços de vela nº 5', checked: false, price: 0, ganho: false },
-            { text: '03 cigarros para Pompo Gira', checked: false, price: 0, ganho: false },
-            { text: '02 suportes para vela sete dias', checked: false, price: 0, ganho: false },
-            { text: '02 bifes grandes sem passar na máquina', checked: false, price: 0, ganho: false },
-            { text: '01 vidro de azeite de Dendê', checked: false, price: 0, ganho: false },
-            { text: '01 kg de farinha de mandioca', checked: false, price: 0, ganho: false },
-            { text: '01 charruto para Exu', checked: false, price: 0, ganho: false },
-            { text: '01 cápsula de pimenta da Costa', checked: false, price: 0, ganho: false },
-            { text: '01 cacho de uva Itália', checked: false, price: 0, ganho: false },
-            { text: '01 pacote de canjica', checked: false, price: 0, ganho: false },
-            { text: '01 champanhe de Oxalá', checked: false, price: 0, ganho: false },
-            { text: '01 cachaça para Exu', checked: false, price: 0, ganho: false },
-            { text: '01 champanhe para Pompo Gira', checked: false, price: 0, ganho: false },
-            { text: '01 taça para Pombo Gira', checked: false, price: 0, ganho: false },
-            { text: '01 pacote de banha de Ori', checked: false, price: 0, ganho: false },
-            { text: '01 defumador espiritual', checked: false, price: 0, ganho: false },
-            { text: '01 semente de Obi', checked: false, price: 0, ganho: false },
-            { text: '01 semente de Orobo', checked: false, price: 0, ganho: false },
-            { text: '01 pemba branca', checked: false, price: 0, ganho: false },
-            { text: 'Coco ralado', checked: false, price: 0, ganho: false }
-        ]
-    },
-    "gerais": {
-        title: "Materiais Gerais",
-        isRitual: true,
-        items: [
-            { text: '04 Copos Grandes de Vidro', checked: false, price: 0, ganho: false },
-            { text: '08 latas de óleo', checked: false, price: 0, ganho: false },
-            { text: '03 caixas de lamparinas São Jorge', checked: false, price: 0, ganho: false },
-            { text: '02 caixas de fósforo', checked: false, price: 0, ganho: false },
-            { text: '01 quartinha de barro (20 cm)', checked: false, price: 0, ganho: false },
-            { text: '01 prato branco', checked: false, price: 0, ganho: false },
-            { text: '01 colher', checked: false, price: 0, ganho: false },
-            { text: '01 xícara com pires branco', checked: false, price: 0, ganho: false },
-            { text: '01 presto barba', checked: false, price: 0, ganho: false },
-            { text: '01 esteira', checked: false, price: 0, ganho: false }
-        ]
-    },
-     "criacao": {
-        title: "Criação",
-        isRitual: true,
-        items: [
-            { text: '01 pombo branco', checked: false, price: 0, ganho: false }
-        ]
-    },
-    "rancho": {
-        title: "Rancho da Semana",
-        isRitual: false,
-        items: [ { "text": "2 KG DE ARROZ AMARELO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE ARROZ BRANCO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE AÇÚCAR", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE TRIGO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MACARRÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 AZEITE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CANJICA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG FARINHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG FEIJÃO VERMELHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAFÉ", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE LEITE (12 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 BANDEJA DE OVOS (30 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 QUEIJO RALADO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LEITE CONDENSADO", "checked": false, "price": 0, "ganho": false }, { "text": "6 CREME DE LEITE", "checked": false, "price": 0, "ganho": false }, { "text": "4 KG DE SAL", "checked": false, "price": 0, "ganho": false }, { "text": "8 REFRIGERANTE", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE PAPEL TOALHA", "checked": false, "price": 0, "ganho": false }, { "text": "4 PACOTES DE BOLACHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE COCO RALADO DE 100G CADA", "checked": false, "price": 0, "ganho": false }, { "text": "1 MASSA DE TOMATE ELEFANTE MÉDIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VIDRO DE LEITE DE COCO", "checked": false, "price": 0, "ganho": false }, { "text": "10 SUCOS", "checked": false, "price": 0, "ganho": false }, { "text": "1 TEMPERO VERDE A VONTADE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CEBOLA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE TOMATE", "checked": false, "price": 0, "ganho": false }, { "text": "3 KG DE BATATA", "checked": false, "price": 0, "ganho": false }, { "text": "VERDURAS DA SUA PREFERENCIA", "checked": false, "price": 0, "ganho": false }, { "text": "FRUTAS A GOSTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MARGARINA QUALLY", "checked": false, "price": 0, "ganho": false }, { "text": "1 NATA", "checked": false, "price": 0, "ganho": false }, { "text": "1 REQUEIJÃO DE 400G", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE QUEIJO", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE PRESUNTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 CALDO DE FRANGO GRANDE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE MOÍDA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE BIFE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE PARA ASSAR DE PANELA", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE COXA E SOBRECOXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA CALABRESA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA PARA CHURRASCO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE FILÉ DE PEIXE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAMARÃO SEM CASCA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VASSOURA", "checked": false, "price": 0, "ganho": false }, { "text": "1 RODO DE CHÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 PANO DE PRATO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LITRO ÁGUA SANITÁRIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 AMACIANTE DE 2 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE ESPONJA DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE BOMBRIL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PALHA DE AÇO", "checked": false, "price": 0, "ganho": false }, { "text": "15 CREME DENTAL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 100 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 30 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "6 DETERGENTE DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE SABÃO EM PÓ (OMO, BRILHANTE OU TIXAN)", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE VELAS", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE MILHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE ERVILHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CEBOLA ROXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 COMINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 POTE DE ALHO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE FEIJÃO FRADINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 BOMBONAS DE ÁGUA", "checked": false, "price": 0, "ganho": false }, { "text": "200 COPOS DESCARTÁVEIS 200ML", "checked": false, "price": 0, "ganho": false }, { "text": "ÁGUA 1 FARDO DIVIDIR ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false }, { "text": "2 BOTIJÃO DE GÁS DIVIDIDO ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false } ]
+    const defaultState = {
+        "roupas": {
+            title: "Roupas e Acessórios",
+            isRitual: true,
+            items: [
+                { text: '05 cuecas ou calcinhas brancas', checked: false, price: 0, ganho: false },
+                { text: '04 lenços brancos', checked: false, price: 0, ganho: false },
+                { text: '04 toalhinhas para o banco', checked: false, price: 0, ganho: false },
+                { text: '04 lençóis brancos (80x80)', checked: false, price: 0, ganho: false },
+                { text: '03 fronhas brancas', checked: false, price: 0, ganho: false },
+                { text: '02 sutiãs', checked: false, price: 0, ganho: false },
+                { text: '02 jalecos ou camisetas brancas', checked: false, price: 0, ganho: false },
+                { text: '02 calças brancas', checked: false, price: 0, ganho: false },
+                { text: '02 lenços pequenos para tapar os olhos', checked: false, price: 0, ganho: false },
+                { text: '01 traje completo para saída de branco', checked: false, price: 0, ganho: false },
+                { text: '01 quepe para saída ou turbante', checked: false, price: 0, ganho: false },
+                { text: '01 boné', checked: false, price: 0, ganho: false },
+                { text: '01 chinelo branco', checked: false, price: 0, ganho: false },
+                { text: '01 punhal para coração', checked: false, price: 0, ganho: false },
+                { text: '01 pente branco', checked: false, price: 0, ganho: false }
+            ]
+        },
+        "rituais": {
+            title: "Itens para Rituais e Oferendas",
+            isRitual: true,
+            items: [
+                { text: '07 Velas de Cera Grande', checked: false, price: 0, ganho: false },
+                { text: '03 Alguidares Médios', checked: false, price: 0, ganho: false },
+                { text: '02 potes/vidros de Mel', checked: false, price: 0, ganho: false },
+                { text: '02 Sabões de Coco', checked: false, price: 0, ganho: false },
+                { text: '01 Caixa e 02 Velas de 7 Dias', checked: false, price: 0, ganho: false },
+                { text: '21 unidades de Quiabo', checked: false, price: 0, ganho: false },
+                { text: '05 panos de 1 metro', checked: false, price: 0, ganho: false },
+                { text: '05 limões', checked: false, price: 0, ganho: false },
+                { text: '05 ramos de Trigo', checked: false, price: 0, ganho: false },
+                { text: '04 ovos brancos', checked: false, price: 0, ganho: false },
+                { text: '03 maços de vela nº 5', checked: false, price: 0, ganho: false },
+                { text: '03 cigarros para Pompo Gira', checked: false, price: 0, ganho: false },
+                { text: '02 suportes para vela sete dias', checked: false, price: 0, ganho: false },
+                { text: '02 bifes grandes sem passar na máquina', checked: false, price: 0, ganho: false },
+                { text: '01 vidro de azeite de Dendê', checked: false, price: 0, ganho: false },
+                { text: '01 kg de farinha de mandioca', checked: false, price: 0, ganho: false },
+                { text: '01 charruto para Exu', checked: false, price: 0, ganho: false },
+                { text: '01 cápsula de pimenta da Costa', checked: false, price: 0, ganho: false },
+                { text: '01 cacho de uva Itália', checked: false, price: 0, ganho: false },
+                { text: '01 pacote de canjica', checked: false, price: 0, ganho: false },
+                { text: '01 champanhe de Oxalá', checked: false, price: 0, ganho: false },
+                { text: '01 cachaça para Exu', checked: false, price: 0, ganho: false },
+                { text: '01 champanhe para Pompo Gira', checked: false, price: 0, ganho: false },
+                { text: '01 taça para Pombo Gira', checked: false, price: 0, ganho: false },
+                { text: '01 pacote de banha de Ori', checked: false, price: 0, ganho: false },
+                { text: '01 defumador espiritual', checked: false, price: 0, ganho: false },
+                { text: '01 semente de Obi', checked: false, price: 0, ganho: false },
+                { text: '01 semente de Orobo', checked: false, price: 0, ganho: false },
+                { text: '01 pemba branca', checked: false, price: 0, ganho: false },
+                { text: 'Coco ralado', checked: false, price: 0, ganho: false }
+            ]
+        },
+        "gerais": {
+            title: "Materiais Gerais",
+            isRitual: true,
+            items: [
+                { text: '04 Copos Grandes de Vidro', checked: false, price: 0, ganho: false },
+                { text: '08 latas de óleo', checked: false, price: 0, ganho: false },
+                { text: '03 caixas de lamparinas São Jorge', checked: false, price: 0, ganho: false },
+                { text: '02 caixas de fósforo', checked: false, price: 0, ganho: false },
+                { text: '01 quartinha de barro (20 cm)', checked: false, price: 0, ganho: false },
+                { text: '01 prato branco', checked: false, price: 0, ganho: false },
+                { text: '01 colher', checked: false, price: 0, ganho: false },
+                { text: '01 xícara com pires branco', checked: false, price: 0, ganho: false },
+                { text: '01 presto barba', checked: false, price: 0, ganho: false },
+                { text: '01 esteira', checked: false, price: 0, ganho: false }
+            ]
+        },
+         "criacao": {
+            title: "Criação",
+            isRitual: true,
+            items: [
+                { text: '01 pombo branco', checked: false, price: 0, ganho: false }
+            ]
+        },
+        "rancho": {
+            title: "Rancho da Semana",
+            isRitual: false,
+            items: [ { "text": "2 KG DE ARROZ AMARELO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE ARROZ BRANCO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE AÇÚCAR", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE TRIGO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MACARRÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 AZEITE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CANJICA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG FARINHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG FEIJÃO VERMELHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAFÉ", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE LEITE (12 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 BANDEJA DE OVOS (30 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 QUEIJO RALADO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LEITE CONDENSADO", "checked": false, "price": 0, "ganho": false }, { "text": "6 CREME DE LEITE", "checked": false, "price": 0, "ganho": false }, { "text": "4 KG DE SAL", "checked": false, "price": 0, "ganho": false }, { "text": "8 REFRIGERANTE", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE PAPEL TOALHA", "checked": false, "price": 0, "ganho": false }, { "text": "4 PACOTES DE BOLACHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE COCO RALADO DE 100G CADA", "checked": false, "price": 0, "ganho": false }, { "text": "1 MASSA DE TOMATE ELEFANTE MÉDIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VIDRO DE LEITE DE COCO", "checked": false, "price": 0, "ganho": false }, { "text": "10 SUCOS", "checked": false, "price": 0, "ganho": false }, { "text": "1 TEMPERO VERDE A VONTADE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CEBOLA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE TOMATE", "checked": false, "price": 0, "ganho": false }, { "text": "3 KG DE BATATA", "checked": false, "price": 0, "ganho": false }, { "text": "VERDURAS DA SUA PREFERENCIA", "checked": false, "price": 0, "ganho": false }, { "text": "FRUTAS A GOSTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MARGARINA QUALLY", "checked": false, "price": 0, "ganho": false }, { "text": "1 NATA", "checked": false, "price": 0, "ganho": false }, { "text": "1 REQUEIJÃO DE 400G", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE QUEIJO", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE PRESUNTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 CALDO DE FRANGO GRANDE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE MOÍDA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE BIFE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE PARA ASSAR DE PANELA", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE COXA E SOBRECOXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA CALABRESA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA PARA CHURRASCO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE FILÉ DE PEIXE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAMARÃO SEM CASCA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VASSOURA", "checked": false, "price": 0, "ganho": false }, { "text": "1 RODO DE CHÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 PANO DE PRATO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LITRO ÁGUA SANITÁRIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 AMACIANTE DE 2 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE ESPONJA DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE BOMBRIL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PALHA DE AÇO", "checked": false, "price": 0, "ganho": false }, { "text": "15 CREME DENTAL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 100 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 30 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "6 DETERGENTE DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE SABÃO EM PÓ (OMO, BRILHANTE OU TIXAN)", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE VELAS", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE MILHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE ERVILHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CEBOLA ROXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 COMINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 POTE DE ALHO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE FEIJÃO FRADINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 BOMBONAS DE ÁGUA", "checked": false, "price": 0, "ganho": false }, { "text": "200 COPOS DESCARTÁVEIS 200ML", "checked": false, "price": 0, "ganho": false }, { "text": "ÁGUA 1 FARDO DIVIDIR ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false }, { "text": "2 BOTIJÃO DE GÁS DIVIDIDO ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false } ]
     }
 };
 
@@ -427,3 +450,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
