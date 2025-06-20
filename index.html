@@ -1,147 +1,188 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Lista de Itens - Controle</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .editable-span {
-            cursor: text;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-        .editable-span:hover {
-            background-color: #eef8f9;
-        }
-        .editable-span:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #5daeb5;
-            background-color: white;
-        }
-        .price-input {
-            width: 100px;
-            padding: 4px;
-            border-radius: 6px;
-            text-align: right;
-            border: 1px solid #ccc;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Controle de Itens</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    .editable-span {
+        cursor: text;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .editable-span:hover {
+        background-color: #eef8f9;
+    }
+    .editable-span:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #5daeb5;
+        background-color: white;
+    }
+    .price-input {
+        width: 90px;
+        padding: 4px;
+        border-radius: 6px;
+        text-align: right;
+        border: 1px solid #ccc;
+    }
+</style>
 </head>
 <body class="bg-gray-100 p-8">
 
-    <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-        <h1 class="text-3xl font-bold mb-4 text-center">Controle de Itens</h1>
+<div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold mb-4 text-center">Controle de Itens</h1>
 
-        <div id="section" class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Roupas e Acessórios</h2>
-            <ul id="item-list" class="space-y-2"></ul>
-            <div class="flex mt-2">
-                <input id="new-item" type="text" placeholder="Adicionar item..." class="flex-grow p-2 border rounded-l-md">
-                <button onclick="addItem()" class="bg-blue-500 text-white px-4 rounded-r-md">+</button>
-            </div>
-        </div>
-
-        <div class="bg-blue-100 p-4 rounded-lg">
-            <p class="font-semibold">Total da Sessão: <span id="total-session">R$ 0,00</span></p>
-            <p class="font-semibold">Total Contribuição (Ganhos): <span id="total-contribution">R$ 0,00</span></p>
+    <div id="roupas-section" class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Roupas e Acessórios</h2>
+        <ul id="roupas-list" class="space-y-2"></ul>
+        <div class="flex mt-2">
+            <input id="roupas-new-item" type="text" placeholder="Adicionar item..." class="flex-grow p-2 border rounded-l-md">
+            <button onclick="addItem('roupas')" class="bg-blue-500 text-white px-4 rounded-r-md">+</button>
         </div>
     </div>
 
-    <script>
-        const itemList = document.getElementById('item-list');
-        const totalSessionEl = document.getElementById('total-session');
-        const totalContributionEl = document.getElementById('total-contribution');
+    <div class="bg-blue-100 p-4 rounded-lg mb-4">
+        <p class="font-semibold">Total da Sessão: <span id="roupas-total">R$ 0,00</span></p>
+        <p class="font-semibold">Total Contribuição (Ganhos): <span id="roupas-contribuicao">R$ 0,00</span></p>
+    </div>
 
-        const items = [];
+    <div class="bg-green-200 p-4 rounded-lg">
+        <p class="font-bold text-xl">TOTAL GERAL: <span id="total-geral">R$ 0,00</span></p>
+        <p class="font-bold text-xl">TOTAL CONTRIBUIÇÃO: <span id="total-contribuicao">R$ 0,00</span></p>
+    </div>
+</div>
 
-        function addItem(text = '', price = '', checked = false, gifted = false) {
-            const item = { text, price, checked, gifted };
-            items.push(item);
-            renderItems();
-        }
+<script>
+const storageKey = 'controleItensV2';
+let state = {
+    roupas: []
+};
 
-        function renderItems() {
-            itemList.innerHTML = '';
-            let total = 0;
-            let contribution = 0;
+function saveState() {
+    localStorage.setItem(storageKey, JSON.stringify(state));
+}
 
-            items.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center gap-2';
+function loadState() {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+        state = JSON.parse(saved);
+    }
+}
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = item.checked;
-                checkbox.addEventListener('change', () => {
-                    item.checked = checkbox.checked;
-                    calculateTotals();
-                });
+function createItemElement(section, item, index) {
+    const li = document.createElement('li');
+    li.className = 'flex items-center gap-2';
 
-                const span = document.createElement('span');
-                span.contentEditable = true;
-                span.className = 'editable-span flex-grow';
-                span.textContent = item.text;
-                span.addEventListener('input', () => {
-                    item.text = span.textContent;
-                });
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = item.checked;
+    checkbox.addEventListener('change', () => {
+        item.checked = checkbox.checked;
+        update();
+    });
 
-                const priceInput = document.createElement('input');
-                priceInput.type = 'number';
-                priceInput.className = 'price-input';
-                priceInput.placeholder = 'R$ 0,00';
-                priceInput.value = item.price;
-                priceInput.addEventListener('input', () => {
-                    item.price = priceInput.value;
-                    calculateTotals();
-                });
+    const span = document.createElement('span');
+    span.contentEditable = true;
+    span.className = 'editable-span flex-grow';
+    span.textContent = item.text;
+    span.addEventListener('input', () => {
+        item.text = span.textContent;
+    });
 
-                const giftCheckbox = document.createElement('input');
-                giftCheckbox.type = 'checkbox';
-                giftCheckbox.checked = item.gifted;
-                giftCheckbox.title = "Ganhei este item";
-                giftCheckbox.addEventListener('change', () => {
-                    item.gifted = giftCheckbox.checked;
-                    calculateTotals();
-                });
+    const priceInput = document.createElement('input');
+    priceInput.type = 'number';
+    priceInput.className = 'price-input';
+    priceInput.placeholder = 'R$ 0,00';
+    priceInput.step = '0.01';
+    priceInput.min = '0';
+    priceInput.value = item.price;
+    priceInput.addEventListener('input', () => {
+        item.price = priceInput.value;
+        update();
+    });
 
-                const giftLabel = document.createElement('label');
-                giftLabel.textContent = 'Ganhei';
-                giftLabel.className = 'text-sm';
+    const ganhoCheckbox = document.createElement('input');
+    ganhoCheckbox.type = 'checkbox';
+    ganhoCheckbox.checked = item.ganho;
+    ganhoCheckbox.title = 'Ganhei';
+    ganhoCheckbox.addEventListener('change', () => {
+        item.ganho = ganhoCheckbox.checked;
+        update();
+    });
 
-                li.appendChild(checkbox);
-                li.appendChild(span);
-                li.appendChild(priceInput);
-                li.appendChild(giftCheckbox);
-                li.appendChild(giftLabel);
+    const ganhoLabel = document.createElement('label');
+    ganhoLabel.textContent = 'Ganhei';
+    ganhoLabel.className = 'text-sm';
 
-                itemList.appendChild(li);
+    li.appendChild(checkbox);
+    li.appendChild(span);
+    li.appendChild(priceInput);
+    li.appendChild(ganhoCheckbox);
+    li.appendChild(ganhoLabel);
 
-                const price = parseFloat(item.price) || 0;
-                total += price;
-                if (item.gifted) {
-                    contribution += price;
-                }
-            });
+    return li;
+}
 
-            totalSessionEl.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            totalContributionEl.textContent = `R$ ${contribution.toFixed(2).replace('.', ',')}`;
-        }
+function renderSection(section) {
+    const list = document.getElementById(`${section}-list`);
+    list.innerHTML = '';
+    state[section].forEach((item, index) => {
+        const li = createItemElement(section, item, index);
+        list.appendChild(li);
+    });
+}
 
-        function calculateTotals() {
-            renderItems();
-        }
+function addItem(section) {
+    const input = document.getElementById(`${section}-new-item`);
+    const text = input.value.trim();
+    if (text) {
+        state[section].push({ text, checked: false, price: '', ganho: false });
+        input.value = '';
+        update();
+    }
+}
 
-        document.getElementById('new-item').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addItem(this.value);
-                this.value = '';
+function calculateTotals() {
+    let totalGeral = 0;
+    let totalContribuicao = 0;
+
+    ['roupas'].forEach(section => {
+        let total = 0;
+        let contribuicao = 0;
+        state[section].forEach(item => {
+            const price = parseFloat(item.price) || 0;
+            total += price;
+            if (item.ganho) {
+                contribuicao += price;
             }
         });
 
-        // Itens de exemplo iniciais
-        addItem('05 cuecas brancas');
-        addItem('04 lenços brancos');
-        addItem('01 traje completo');
-    </script>
+        document.getElementById(`${section}-total`).textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        document.getElementById(`${section}-contribuicao`).textContent = `R$ ${contribuicao.toFixed(2).replace('.', ',')}`;
+
+        totalGeral += total;
+        totalContribuicao += contribuicao;
+    });
+
+    document.getElementById('total-geral').textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+    document.getElementById('total-contribuicao').textContent = `R$ ${totalContribuicao.toFixed(2).replace('.', ',')}`;
+}
+
+function update() {
+    renderSection('roupas');
+    calculateTotals();
+    saveState();
+}
+
+// Inicialização
+loadState();
+if (!state.roupas.length) {
+    state.roupas = [
+        { text: '05 cuecas brancas', checked: false, price: '', ganho: false },
+        { text: '04 lenços brancos', checked: false, price: '', ganho: false }
+    ];
+}
+update();
+</script>
 </body>
 </html>
