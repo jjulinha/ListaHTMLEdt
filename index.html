@@ -15,11 +15,22 @@
             background-color: #F5F2E8; 
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23BDE0E1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
+        .checklist-item { display: flex; align-items: center; }
         .checklist-item input:checked + span { text-decoration: line-through; color: #6b7280; }
         .progress-bar-fill { transition: width 0.5s ease-in-out; }
         .editable-span { cursor: text; flex-grow: 1; padding: 4px 8px; border-radius: 6px; }
         .editable-span:hover { background-color: #eef8f9; }
         .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
+        .price-input {
+            width: 80px;
+            margin-left: auto;
+            text-align: right;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: transparent;
+            border: 2px solid #eef8f9;
+        }
+        .price-input:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; border-color: #5daeb5; }
         .card { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); }
         .main-title { color: #0E4249; }
         .subtitle { color: #3E6064; }
@@ -57,9 +68,9 @@
         </div>
 
         <div class="space-y-8">
-            <!-- Categoria: Roupas Necessárias -->
-            <div id="roupas-section" class="card p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Roupas Necessárias</h2>
+            <!-- As seções serão preenchidas dinamicamente pelo JavaScript -->
+            <div id="roupas-acessorios-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Roupas e Acessórios</h2>
                 <ul class="space-y-3"></ul>
                 <div class="mt-4 flex">
                     <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
@@ -67,8 +78,8 @@
                 </div>
             </div>
 
-            <div id="materiais-section" class="card p-6 rounded-xl shadow-md">
-                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Materiais Adicionais</h2>
+            <div id="rituais-oferendas-section" class="card p-6 rounded-xl shadow-md">
+                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Itens para Rituais e Oferendas</h2>
                 <ul class="space-y-3"></ul>
                 <div class="mt-4 flex">
                     <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
@@ -76,8 +87,8 @@
                 </div>
             </div>
             
-            <div id="cachoeira-section" class="card p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Cachoeira</h2>
+            <div id="materiais-gerais-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Materiais Gerais</h2>
                 <ul class="space-y-3"></ul>
                 <div class="mt-4 flex">
                     <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
@@ -85,8 +96,8 @@
                 </div>
             </div>
 
-            <div id="pade-section" class="card p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Padê de Segunda Feira (Exu e Bombo Gira)</h2>
+            <div id="criacao-section" class="card p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Criação</h2>
                 <ul class="space-y-3"></ul>
                 <div class="mt-4 flex">
                     <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
@@ -94,24 +105,6 @@
                 </div>
             </div>
             
-            <div id="oxala-section" class="card p-6 rounded-xl shadow-md">
-                <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Comida de Oxalá</h2>
-                <ul class="space-y-3"></ul>
-                 <div class="mt-4 flex">
-                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
-                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
-                </div>
-            </div>
-
-            <div id="bebidas-section" class="card p-6 rounded-xl shadow-md">
-                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Bebidas</h2>
-                <ul class="space-y-3"></ul>
-                <div class="mt-4 flex">
-                    <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
-                    <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
-                </div>
-            </div>
-
             <div id="rancho-section" class="card p-6 rounded-xl shadow-md">
                 <h2 class="text-2xl font-semibold section-title border-b-2 pb-3 mb-4">Rancho da Semana</h2>
                 <div class="mb-6 mt-4">
@@ -127,6 +120,26 @@
                  <div class="mt-4 flex">
                     <input type="text" placeholder="Adicionar item..." class="add-input w-full p-2 rounded-l-md border-2">
                     <button class="add-button font-bold py-2 px-4 rounded-r-md">+</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumo dos Custos -->
+        <div class="mt-8 p-6 bg-blue-100 rounded-xl shadow-inner">
+            <h2 class="text-2xl font-semibold main-title">Resumo dos Custos</h2>
+            <div class="mt-4 space-y-2 text-lg">
+                <div class="flex justify-between">
+                    <span class="font-medium subtitle">Total Itens Rituais:</span>
+                    <span id="total-rituais" class="font-bold main-title">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium subtitle">Total Rancho da Semana:</span>
+                    <span id="total-rancho" class="font-bold main-title">R$ 0,00</span>
+                </div>
+                <hr class="my-2 border-t-2 border-blue-200">
+                <div class="flex justify-between text-xl">
+                    <span class="font-bold main-title">TOTAL GERAL:</span>
+                    <span id="total-geral" class="font-bold main-title">R$ 0,00</span>
                 </div>
             </div>
         </div>
@@ -153,21 +166,48 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const storageKey = 'camarinhaOboriState-vLocal'; 
+            const storageKey = 'camarinhaOboriState-vLocalPrice-v3'; 
             
-            // FIX: Only register Service Worker on secure origins (https or localhost)
-            if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-                navigator.serviceWorker.register('sw.js').catch(err => console.error("Service Worker registration failed:", err));
+            if ('serviceWorker' in navigator) {
+                const serviceWorkerContent = `
+                    const CACHE_NAME = 'camarinha-obori-cache-vFinal-2';
+                    const urlsToCache = ['./', './index.html', './manifest.json', './icone-obori.jpg'];
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request).then(response => response || fetch(event.request))
+                        );
+                    });
+                    self.addEventListener('activate', event => {
+                        const cacheWhitelist = [CACHE_NAME];
+                        event.waitUntil(
+                            caches.keys().then(cacheNames => Promise.all(
+                                cacheNames.map(cacheName => {
+                                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                        return caches.delete(cacheName);
+                                    }
+                                })
+                            ))
+                        );
+                    });
+                `;
+                const swBlob = new Blob([serviceWorkerContent], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('Service worker registered successfully:', reg))
+                    .catch(err => console.error('Service worker registration failed:', err));
             }
 
             const defaultState = {
-                "roupas-section": [ { "text": "04 lenços brancos", "checked": false }, { "text": "03 fronhas brancas", "checked": false }, { "text": "04 lenços brancos 80 x 80", "checked": false }, { "text": "05 cuecas ou calcinhas brancas", "checked": false }, { "text": "02 sutiãs", "checked": false }, { "text": "01 traje completo para saída de branco", "checked": false }, { "text": "01 boné", "checked": false }, { "text": "04 toalhinhas para o branco", "checked": false }, { "text": "01 quipá para saída ou turbante (feminino)", "checked": false }, { "text": "01 chinelo branco", "checked": false }, { "text": "02 jalecos ou camisetas brancas", "checked": false }, { "text": "02 calças brancas", "checked": false }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false }, { "text": "01 punhal para coração", "checked": false }, { "text": "05 panos de 1 metro", "checked": false }, { "text": "02 suporte para vela sete dias", "checked": false }, { "text": "01 alguidar médio vidro para guias", "checked": false }, { "text": "Criação: 1 pombo branco", "checked": false }, { "text": "Guia para Pai e Mãe de conforme o Santo", "checked": false }, { "text": "Guia de Preto Velho e Oxosse", "checked": false } ],
-                "materiais-section": [ { "text": "01 quartinha de barro (20 cm)", "checked": false }, { "text": "03 copos grandes de vidro", "checked": false }, { "text": "01 prato branco", "checked": false }, { "text": "01 colher", "checked": false }, { "text": "01 xícara com pires branco", "checked": false }, { "text": "01 prato barba", "checked": false }, { "text": "01 defumador espiritual", "checked": false }, { "text": "01 esteira", "checked": false }, { "text": "03 maços de vela nº 5", "checked": false }, { "text": "03 caixas de lamparinas São Jorge", "checked": false }, { "text": "01 caixa vela de sete dias", "checked": false }, { "text": "08 latas de óleo", "checked": false }, { "text": "01 sabão de coco", "checked": false }, { "text": "01 semente de obi", "checked": false }, { "text": "01 semente de orobô", "checked": false }, { "text": "01 pacote de banha de ori", "checked": false }, { "text": "01 vidro de mel grande", "checked": false }, { "text": "01 caixa de vela grande", "checked": false }, { "text": "01 pente branco", "checked": false } ],
-                "cachoeira-section": [ { "text": "21 unid. de quiabo", "checked": false }, { "text": "1 pote de mel", "checked": false }, { "text": "1 sabão de coco", "checked": false }, { "text": "4 ovos branco", "checked": false } ],
-                "pade-section": [ { "text": "2 bifes grandes sem passar na máquina", "checked": false }, { "text": "1 vidro azeite de dendê", "checked": false }, { "text": "2 alguidares médio vidrado", "checked": false }, { "text": "1 kg de farinha de mandioca", "checked": false }, { "text": "7 cebolas roxas", "checked": false }, { "text": "5 limões", "checked": false }, { "text": "1 charuto para Exu", "checked": false }, { "text": "1 cápsula pimenta da costa", "checked": false } ],
-                "oxala-section": [ { "text": "1 cacho de uva Itália bem bonito", "checked": false }, { "text": "1 pacote de canjica", "checked": false }, { "text": "1 champanhe de Oxalá", "checked": false }, { "text": "5 velas de cera grande", "checked": false }, { "text": "5 ramos de trigo", "checked": false }, { "text": "Coco ralado", "checked": false } ],
-                "bebidas-section": [ { "text": "1 cachaça para Exu", "checked": false }, { "text": "1 copo de vidro para Exu", "checked": false }, { "text": "1 champanhe para Pombo Gira", "checked": false }, { "text": "1 taça para Pombo Gira", "checked": false }, { "text": "2 velas de 7 dias", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "3 cigarros para Pombo Gira", "checked": false } ],
-                "rancho-section": [ { "text": "2 kg de arroz amarelo", "checked": false }, { "text": "1 kg de arroz branco", "checked": false }, { "text": "2 kg de feijão", "checked": false }, { "text": "1 kg de macarrão", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de canjica", "checked": false }, { "text": "1 pacote de sal", "checked": false }, { "text": "1 kg de fubá", "checked": false }, { "text": "1 kg de sal", "checked": false }, { "text": "1 litro de azeite (ou 1 unid.)", "checked": false }, { "text": "1 bandeja de ovos (30 unid.)", "checked": false }, { "text": "3 queijos ralados", "checked": false }, { "text": "1 leite condensado", "checked": false }, { "text": "1 cacho de banana", "checked": false }, { "text": "1 refrigerante", "checked": false }, { "text": "1 pacote papel toalha", "checked": false }, { "text": "2 pacotes coco ralado 100g cada", "checked": false }, { "text": "1 massa de tomate Elefante média", "checked": false }, { "text": "1 vidro de leite de coco", "checked": false }, { "text": "10 sucos", "checked": false }, { "text": "1 sardinha", "checked": false }, { "text": "1 creme de leite", "checked": false }, { "text": "1 extrato de tomate", "checked": false }, { "text": "1 maionese", "checked": false }, { "text": "2 garrafas de 51", "checked": false }, { "text": "1 margarina Qualy", "checked": false }, { "text": "1 frango grande", "checked": false }, { "text": "400g de polvilho", "checked": false }, { "text": "1 caldo de frango grande", "checked": false }, { "text": "2 kg de carne moída", "checked": false }, { "text": "2 kg de bife", "checked": false }, { "text": "2 kg de carne para assar de panela", "checked": false }, { "text": "1 pct costela com osso serrada", "checked": false }, { "text": "1 pct de linguiça caseira", "checked": false }, { "text": "1 kg de linguiça para churrasco", "checked": false }, { "text": "1 pct de peito de frango", "checked": false }, { "text": "1 kg de amendoim sem casca", "checked": false }, { "text": "2 kg de açúcar", "checked": false }, { "text": "1 kg de farinha de trigo", "checked": false }, { "text": "1 pct de pão", "checked": false }, { "text": "3 pães de chão", "checked": false }, { "text": "3 papéis alumínio", "checked": false }, { "text": "3 detergentes de 2 litros", "checked": false }, { "text": "2 esponjas para louça", "checked": false }, { "text": "1 pacote de fósforo", "checked": false }, { "text": "1 sabonete", "checked": false }, { "text": "1 papel higiênico", "checked": false }, { "text": "1 pct de algodão", "checked": false }, { "text": "1 pct de absorvente (30 unidades)", "checked": false }, { "text": "1 desinfetante de louça", "checked": false }, { "text": "1 sabão São Jorge (ou Pombo, Brilhante ou outro)", "checked": false }, { "text": "2 caixas de fósforo", "checked": false }, { "text": "1 caixa de sabão", "checked": false }, { "text": "1 caixa de fósforo", "checked": false }, { "text": "1 creme de cabelo", "checked": false }, { "text": "1 condimento", "checked": false }, { "text": "1 pct de alho", "checked": false }, { "text": "2 kg de feijão fradinho", "checked": false }, { "text": "20 bombons de arê", "checked": false }, { "text": "20 copos descartáveis 300 ml", "checked": false }, { "text": "10 garrafas divididas entre os detetados", "checked": false }, { "text": "10 unidades de gás dividido entre os detetados", "checked": false } ]
+                "roupas-acessorios-section": [ { "text": "05 cuecas ou calcinhas brancas", "checked": false, "price": "" }, { "text": "04 lenços brancos", "checked": false, "price": "" }, { "text": "04 toalhinhas para o banco", "checked": false, "price": "" }, { "text": "04 lençóis brancos (80x80)", "checked": false, "price": "" }, { "text": "03 fronhas brancas", "checked": false, "price": "" }, { "text": "02 sutiãs", "checked": false, "price": "" }, { "text": "02 jalecos ou camisetas brancas", "checked": false, "price": "" }, { "text": "02 calças brancas", "checked": false, "price": "" }, { "text": "02 lenços pequenos para tapar os olhos", "checked": false, "price": "" }, { "text": "01 traje completo para saída de branco", "checked": false, "price": "" }, { "text": "01 quepe para saída ou turbante", "checked": false, "price": "" }, { "text": "01 boné", "checked": false, "price": "" }, { "text": "01 chinelo branco", "checked": false, "price": "" }, { "text": "01 punhal para coração", "checked": false, "price": "" }, { "text": "01 pente branco", "checked": false, "price": "" } ],
+                "rituais-oferendas-section": [ { "text": "07 Velas de Cera Grande", "checked": false, "price": "" }, { "text": "03 Alguidares Médios", "checked": false, "price": "" }, { "text": "02 potes/vidros de Mel", "checked": false, "price": "" }, { "text": "02 Sabões de Coco", "checked": false, "price": "" }, { "text": "01 Caixa e 02 Velas de 7 Dias", "checked": false, "price": "" }, { "text": "21 unidades de Quiabo", "checked": false, "price": "" }, { "text": "05 panos de 1 metro", "checked": false, "price": "" }, { "text": "05 limões", "checked": false, "price": "" }, { "text": "05 ramos de Trigo", "checked": false, "price": "" }, { "text": "04 ovos brancos", "checked": false, "price": "" }, { "text": "03 maços de vela nº 5", "checked": false, "price": "" }, { "text": "03 cigarros para Pompo Gira", "checked": false, "price": "" }, { "text": "02 suportes para vela sete dias", "checked": false, "price": "" }, { "text": "02 bifes grandes sem passar na máquina", "checked": false, "price": "" }, { "text": "01 vidro de azeite de Dendê", "checked": false, "price": "" }, { "text": "01 kg de farinha de mandioca", "checked": false, "price": "" }, { "text": "01 charruto para Exu", "checked": false, "price": "" }, { "text": "01 cápsula de pimenta da Costa", "checked": false, "price": "" }, { "text": "01 cacho de uva Itália", "checked": false, "price": "" }, { "text": "01 pacote de canjica", "checked": false, "price": "" }, { "text": "01 champanhe de Oxalá", "checked": false, "price": "" }, { "text": "01 cachaça para Exu", "checked": false, "price": "" }, { "text": "01 champanhe para Pompo Gira", "checked": false, "price": "" }, { "text": "01 taça para Pombo Gira", "checked": false, "price": "" }, { "text": "01 pacote de banha de Ori", "checked": false, "price": "" }, { "text": "01 defumador espiritual", "checked": false, "price": "" }, { "text": "01 semente de Obi", "checked": false, "price": "" }, { "text": "01 semente de Orobo", "checked": false, "price": "" }, { "text": "01 pemba branca", "checked": false, "price": "" }, { "text": "Coco ralado", "checked": false, "price": "" } ],
+                "materiais-gerais-section": [ { "text": "04 Copos Grandes de Vidro", "checked": false, "price": "" }, { "text": "08 latas de óleo", "checked": false, "price": "" }, { "text": "03 caixas de lamparinas São Jorge", "checked": false, "price": "" }, { "text": "02 caixas de fósforo", "checked": false, "price": "" }, { "text": "01 quartinha de barro (20 cm)", "checked": false, "price": "" }, { "text": "01 prato branco", "checked": false, "price": "" }, { "text": "01 colher", "checked": false, "price": "" }, { "text": "01 xícara com pires branco", "checked": false, "price": "" }, { "text": "01 presto barba", "checked": false, "price": "" }, { "text": "01 esteira", "checked": false, "price": "" } ],
+                "criacao-section": [ { "text": "01 pombo branco", "checked": false, "price": "" } ],
+                "rancho-section": [ { "text": "2 KG DE ARROZ AMARELO", "checked": false, "price": "" }, { "text": "1 KG DE ARROZ BRANCO", "checked": false, "price": "" }, { "text": "2 KG DE AÇÚCAR", "checked": false, "price": "" }, { "text": "2 KG DE TRIGO", "checked": false, "price": "" }, { "text": "1 MACARRÃO", "checked": false, "price": "" }, { "text": "6 AZEITE", "checked": false, "price": "" }, { "text": "1 KG DE CANJICA", "checked": false, "price": "" }, { "text": "2 KG FARINHA", "checked": false, "price": "" }, { "text": "1 KG FEIJÃO VERMELHO", "checked": false, "price": "" }, { "text": "1 KG DE CAFÉ", "checked": false, "price": "" }, { "text": "1 CX DE LEITE (12 UNID.)", "checked": false, "price": "" }, { "text": "1 BANDEJA DE OVOS (30 UNID.)", "checked": false, "price": "" }, { "text": "1 QUEIJO RALADO", "checked": false, "price": "" }, { "text": "1 LEITE CONDENSADO", "checked": false, "price": "" }, { "text": "6 CREME DE LEITE", "checked": false, "price": "" }, { "text": "4 KG DE SAL", "checked": false, "price": "" }, { "text": "8 REFRIGERANTE", "checked": false, "price": "" }, { "text": "1 PACOTE PAPEL TOALHA", "checked": false, "price": "" }, { "text": "4 PACOTES DE BOLACHA", "checked": false, "price": "" }, { "text": "1 PACOTE COCO RALADO DE 100G CADA", "checked": false, "price": "" }, { "text": "1 MASSA DE TOMATE ELEFANTE MÉDIA", "checked": false, "price": "" }, { "text": "1 VIDRO DE LEITE DE COCO", "checked": false, "price": "" }, { "text": "10 SUCOS", "checked": false, "price": "" }, { "text": "1 TEMPERO VERDE A VONTADE", "checked": false, "price": "" }, { "text": "2 KG DE CEBOLA", "checked": false, "price": "" }, { "text": "1 KG DE TOMATE", "checked": false, "price": "" }, { "text": "3 KG DE BATATA", "checked": false, "price": "" }, { "text": "VERDURAS DA SUA PREFERENCIA", "checked": false, "price": "" }, { "text": "FRUTAS A GOSTO", "checked": false, "price": "" }, { "text": "1 MARGARINA QUALLY", "checked": false, "price": "" }, { "text": "1 NATA", "checked": false, "price": "" }, { "text": "1 REQUEIJÃO DE 400G", "checked": false, "price": "" }, { "text": "400G DE QUEIJO", "checked": false, "price": "" }, { "text": "400G DE PRESUNTO", "checked": false, "price": "" }, { "text": "1 CALDO DE FRANGO GRANDE", "checked": false, "price": "" }, { "text": "2 KG DE CARNE MOÍDA", "checked": false, "price": "" }, { "text": "2 KG DE BIFE", "checked": false, "price": "" }, { "text": "2 KG DE CARNE PARA ASSAR DE PANELA", "checked": false, "price": "" }, { "text": "2 PACOTES DE COXA E SOBRECOXA", "checked": false, "price": "" }, { "text": "1 KG DE LINGUIÇA CALABRESA", "checked": false, "price": "" }, { "text": "1 KG DE LINGUIÇA PARA CHURRASCO", "checked": false, "price": "" }, { "text": "1 KG DE FILÉ DE PEIXE", "checked": false, "price": "" }, { "text": "1 KG DE CAMARÃO SEM CASCA", "checked": false, "price": "" }, { "text": "1 VASSOURA", "checked": false, "price": "" }, { "text": "1 RODO DE CHÃO", "checked": false, "price": "" }, { "text": "6 PANO DE PRATO", "checked": false, "price": "" }, { "text": "1 LITRO ÁGUA SANITÁRIA", "checked": false, "price": "" }, { "text": "1 AMACIANTE DE 2 LITROS", "checked": false, "price": "" }, { "text": "2 PACOTES DE ESPONJA DE LOUÇA", "checked": false, "price": "" }, { "text": "1 PACOTE DE BOMBRIL", "checked": false, "price": "" }, { "text": "1 PALHA DE AÇO", "checked": false, "price": "" }, { "text": "15 CREME DENTAL", "checked": false, "price": "" }, { "text": "1 PACOTE DE LIXO DE 100 LITROS", "checked": false, "price": "" }, { "text": "1 PACOTE DE LIXO DE 30 LITROS", "checked": false, "price": "" }, { "text": "6 DETERGENTE DE LOUÇA", "checked": false, "price": "" }, { "text": "1 CX DE SABÃO EM PÓ (OMO, BRILHANTE OU TIXAN)", "checked": false, "price": "" }, { "text": "1 CX DE VELAS", "checked": false, "price": "" }, { "text": "1 LATA DE MILHO", "checked": false, "price": "" }, { "text": "1 LATA DE ERVILHA", "checked": false, "price": "" }, { "text": "1 CEBOLA ROXA", "checked": false, "price": "" }, { "text": "1 COMINHO", "checked": false, "price": "" }, { "text": "1 POTE DE ALHO", "checked": false, "price": "" }, { "text": "2 KG DE FEIJÃO FRADINHO", "checked": false, "price": "" }, { "text": "1 BOMBONAS DE ÁGUA", "checked": false, "price": "" }, { "text": "200 COPOS DESCARTÁVEIS 200ML", "checked": false, "price": "" }, { "text": "ÁGUA 1 FARDO DIVIDIR ENTRE OS DEITADOS", "checked": false, "price": "" }, { "text": "2 BOTIJÃO DE GÁS DIVIDIDO ENTRE OS DEITADOS", "checked": false, "price": "" } ]
             };
 
             function saveState() {
@@ -178,7 +218,8 @@
                     section.querySelectorAll('.checklist-item').forEach(item => {
                         const checkbox = item.querySelector('input[type="checkbox"]');
                         const span = item.querySelector('span.editable-span');
-                        items.push({ text: span.textContent, checked: checkbox.checked });
+                        const priceInput = item.querySelector('.price-input');
+                        items.push({ text: span.textContent, checked: checkbox.checked, price: priceInput.value });
                     });
                     currentState[sectionId] = items;
                 });
@@ -187,65 +228,95 @@
 
             function loadState() {
                 const savedStateJSON = localStorage.getItem(storageKey);
-                let stateToRender = defaultState;
-                if (savedStateJSON) {
-                    try {
-                        const parsedState = JSON.parse(savedStateJSON);
-                        // Verifica se o estado guardado não está vazio
-                        if (parsedState && Object.keys(parsedState).length > 0) {
-                            stateToRender = parsedState;
-                        }
-                    } catch (e) {
-                        console.error("Error parsing saved state:", e);
+                let currentState;
+                try {
+                    currentState = savedStateJSON ? JSON.parse(savedStateJSON) : null;
+                    if (currentState && typeof currentState !== 'object') {
+                        currentState = null;
                     }
+                } catch (e) {
+                    console.error("Error parsing saved state:", e);
+                    currentState = null;
                 }
-                renderState(stateToRender);
+                
+                renderState(currentState);
             }
 
             function renderState(state) {
-                for (const sectionId in state) {
+                const data = (state && Object.keys(state).length > 0) ? state : defaultState;
+                for (const sectionId in defaultState) { // Iterar sobre o defaultState para garantir que todas as secções são criadas
                     const section = document.getElementById(sectionId);
                     if (section) {
                         const list = section.querySelector('ul');
                         list.innerHTML = ''; 
-                        const itemsData = state[sectionId] || [];
+                        const itemsData = data[sectionId] || defaultState[sectionId];
                         itemsData.forEach(itemData => {
-                            const newItem = createNewListItem(itemData.text, itemData.checked);
+                            const newItem = createNewListItem(itemData.text, itemData.checked, itemData.price);
                             list.appendChild(newItem);
                         });
                     }
                 }
-                updateAllProgress();
+                updateAllTheThings();
             }
 
-            function createNewListItem(text, checked = false) {
+            function createNewListItem(text, checked = false, price = "") {
                 const li = document.createElement('li');
-                li.className = 'checklist-item flex items-center';
+                li.className = 'checklist-item flex items-center gap-2';
+                
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = checked;
                 checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
+                
                 const span = document.createElement('span');
                 span.contentEditable = 'true';
-                span.className = 'text-gray-800 ml-3 editable-span';
+                span.className = 'text-gray-800 editable-span';
                 span.textContent = text;
+                
+                const priceInput = document.createElement('input');
+                priceInput.type = 'number';
+                priceInput.className = 'price-input w-24 text-right p-1 rounded-md border-2 bg-transparent';
+                priceInput.placeholder = 'R$ 0,00';
+                priceInput.step = '0.01';
+                priceInput.min = '0';
+                priceInput.value = price;
+
                 li.appendChild(checkbox);
                 li.appendChild(span);
+                li.appendChild(priceInput);
+                
                 attachEventListeners(li);
                 return li;
             }
 
             function attachEventListeners(listItem) {
-                listItem.querySelector('input[type="checkbox"]').addEventListener('change', () => {
-                    saveState();
-                    updateAllProgress();
-                });
+                listItem.querySelector('input[type="checkbox"]').addEventListener('change', updateAllTheThings);
                 listItem.querySelector('span.editable-span').addEventListener('blur', saveState);
+                listItem.querySelector('.price-input').addEventListener('input', updateAllTheThings);
             }
             
+            function calculateTotals() {
+                let totalRituais = 0;
+                let totalRancho = 0;
+
+                document.querySelectorAll('#roupas-acessorios-section .price-input, #rituais-oferendas-section .price-input, #materiais-gerais-section .price-input, #criacao-section .price-input').forEach(input => {
+                    totalRituais += parseFloat(input.value) || 0;
+                });
+                
+                document.querySelectorAll('#rancho-section .price-input').forEach(input => {
+                    totalRancho += parseFloat(input.value) || 0;
+                });
+                
+                const totalGeral = totalRituais + totalRancho;
+
+                document.getElementById('total-rituais').textContent = `R$ ${totalRituais.toFixed(2).replace('.', ',')}`;
+                document.getElementById('total-rancho').textContent = `R$ ${totalRancho.toFixed(2).replace('.', ',')}`;
+                document.getElementById('total-geral').textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            }
+
             function updateAllProgress() {
-                const mainCheckboxes = document.querySelectorAll('#roupas-section input, #materiais-section input, #cachoeira-section input, #pade-section input, #oxala-section input, #bebidas-section input');
-                const checkedMainItems = document.querySelectorAll('#roupas-section input:checked, #materiais-section input:checked, #cachoeira-section input:checked, #pade-section input:checked, #oxala-section input:checked, #bebidas-section input:checked');
+                const mainCheckboxes = document.querySelectorAll('#roupas-acessorios-section input, #rituais-oferendas-section input, #materiais-gerais-section input, #criacao-section input');
+                const checkedMainItems = document.querySelectorAll('#roupas-acessorios-section input:checked, #rituais-oferendas-section input:checked, #materiais-gerais-section input:checked, #criacao-section input:checked');
                 const mainPercentage = mainCheckboxes.length > 0 ? (checkedMainItems.length / mainCheckboxes.length) * 100 : 0;
                 document.getElementById('progress-bar-fill').style.width = mainPercentage + '%';
                 document.getElementById('progress-percentage').textContent = Math.round(mainPercentage) + '%';
@@ -257,6 +328,12 @@
                 document.getElementById('rancho-progress-percentage').textContent = Math.round(ranchoPercentage) + '%';
             }
 
+            function updateAllTheThings() {
+                calculateTotals();
+                updateAllProgress();
+                saveState();
+            }
+
             document.querySelectorAll('.add-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const input = this.previousElementSibling;
@@ -266,8 +343,7 @@
                         const newItem = createNewListItem(text);
                         list.appendChild(newItem);
                         input.value = '';
-                        saveState();
-                        updateAllProgress();
+                        updateAllTheThings();
                     }
                 });
             });
@@ -276,7 +352,7 @@
                 document.getElementById('install-instructions').classList.toggle('hidden');
             });
 
-            // --- Inicialização ---
+            // Initialize the app
             loadState();
         });
     </script>
