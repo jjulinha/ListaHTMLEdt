@@ -244,7 +244,7 @@
 
             function renderState(state) {
                 const data = (state && Object.keys(state).length > 0) ? state : defaultState;
-                for (const sectionId in defaultState) { // Iterar sobre o defaultState para garantir que todas as secções são criadas
+                for (const sectionId in defaultState) { 
                     const section = document.getElementById(sectionId);
                     if (section) {
                         const list = section.querySelector('ul');
@@ -263,27 +263,11 @@
                 const li = document.createElement('li');
                 li.className = 'checklist-item flex items-center gap-2';
                 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = checked;
-                checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
-                
-                const span = document.createElement('span');
-                span.contentEditable = 'true';
-                span.className = 'text-gray-800 editable-span';
-                span.textContent = text;
-                
-                const priceInput = document.createElement('input');
-                priceInput.type = 'number';
-                priceInput.className = 'price-input w-24 text-right p-1 rounded-md border-2 bg-transparent';
-                priceInput.placeholder = 'R$ 0,00';
-                priceInput.step = '0.01';
-                priceInput.min = '0';
-                priceInput.value = price;
-
-                li.appendChild(checkbox);
-                li.appendChild(span);
-                li.appendChild(priceInput);
+                li.innerHTML = `
+                    <input type="checkbox" class="h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0" ${checked ? 'checked' : ''}>
+                    <span contenteditable="true" class="text-gray-800 editable-span">${text}</span>
+                    <input type="number" class="price-input w-24 text-right p-1 rounded-md border-2 bg-transparent" placeholder="R$ 0,00" step="0.01" min="0" value="${price || ''}">
+                `;
                 
                 attachEventListeners(li);
                 return li;
@@ -315,8 +299,8 @@
             }
 
             function updateAllProgress() {
-                const mainCheckboxes = document.querySelectorAll('#roupas-acessorios-section input, #rituais-oferendas-section input, #materiais-gerais-section input, #criacao-section input');
-                const checkedMainItems = document.querySelectorAll('#roupas-acessorios-section input:checked, #rituais-oferendas-section input:checked, #materiais-gerais-section input:checked, #criacao-section input:checked');
+                const mainCheckboxes = document.querySelectorAll('#roupas-acessorios-section input[type="checkbox"], #rituais-oferendas-section input[type="checkbox"], #materiais-gerais-section input[type="checkbox"], #criacao-section input[type="checkbox"]');
+                const checkedMainItems = document.querySelectorAll('#roupas-acessorios-section input[type="checkbox"]:checked, #rituais-oferendas-section input[type="checkbox"]:checked, #materiais-gerais-section input[type="checkbox"]:checked, #criacao-section input[type="checkbox"]:checked');
                 const mainPercentage = mainCheckboxes.length > 0 ? (checkedMainItems.length / mainCheckboxes.length) * 100 : 0;
                 document.getElementById('progress-bar-fill').style.width = mainPercentage + '%';
                 document.getElementById('progress-percentage').textContent = Math.round(mainPercentage) + '%';
