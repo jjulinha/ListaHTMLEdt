@@ -12,14 +12,13 @@
         background-color: #F5F2E8; 
         background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23BDE0E1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
-    .checklist-item { display: flex; align-items: center; gap: 0.5rem; }
     .checklist-item input:checked + span { text-decoration: line-through; color: #6b7280; }
     .progress-bar-fill { transition: width 0.5s ease-in-out; }
-    .editable-span { cursor: text; flex-grow: 1; padding: 4px 8px; border-radius: 6px; }
+    .editable-span { cursor: text; padding: 4px 8px; border-radius: 6px; }
     .editable-span:hover { background-color: #eef8f9; }
     .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
     .price-input {
-        width: 100px;
+        width: 110px;
         padding: 4px 8px;
         border-radius: 6px;
         text-align: right;
@@ -80,7 +79,7 @@
 </div>
 
 <script>
-const storageKey = 'controleItensV8';
+const storageKey = 'controleItensV9';
 let state = {};
 
 const defaultState = {
@@ -211,7 +210,7 @@ function loadState() {
         state = defaultState;
     }
     for (const sectionKey in state) {
-        if(Array.isArray(state[sectionKey].items)){
+        if(state[sectionKey] && Array.isArray(state[sectionKey].items)){
             state[sectionKey].items.forEach(item => {
                 item.price = parseFloat(item.price) || 0;
             });
@@ -221,22 +220,35 @@ function loadState() {
 
 function createItemElement(sectionKey, item) {
     const li = document.createElement('li');
-    li.className = 'flex items-center gap-2';
+    li.className = 'flex flex-wrap items-center gap-x-2 gap-y-1';
+
+    const mainPart = document.createElement('div');
+    mainPart.className = 'flex items-center flex-grow';
+
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = item.checked;
+    checkbox.className = 'h-5 w-5 rounded border-gray-400 text-blue-600 focus:ring-blue-500 flex-shrink-0';
     checkbox.onchange = () => {
         item.checked = checkbox.checked;
         updateTotalsAndSave();
     };
+
     const span = document.createElement('span');
     span.contentEditable = true;
-    span.className = 'editable-span flex-grow';
+    span.className = 'editable-span flex-grow ml-2';
     span.textContent = item.text;
     span.onblur = () => {
         item.text = span.textContent;
         saveState();
     };
+
+    mainPart.appendChild(checkbox);
+    mainPart.appendChild(span);
+
+    const controlsPart = document.createElement('div');
+    controlsPart.className = 'flex items-center gap-2 pl-7 sm:pl-0 flex-shrink-0';
+
     const priceInput = document.createElement('input');
     priceInput.type = 'text';
     priceInput.className = 'price-input';
@@ -251,24 +263,30 @@ function createItemElement(sectionKey, item) {
         e.target.value = formatCurrencyForDisplay(numericValue);
         updateTotalsAndSave();
     };
+    
     const ganhoLabel = document.createElement('label');
     ganhoLabel.className = 'text-sm cursor-pointer flex items-center gap-1';
     const ganhoCheckbox = document.createElement('input');
     ganhoCheckbox.type = 'checkbox';
     ganhoCheckbox.checked = item.ganho;
     ganhoCheckbox.title = 'Ganhei';
+    ganhoCheckbox.className = 'h-4 w-4 rounded border-gray-400 text-blue-600 focus:ring-blue-500';
     ganhoCheckbox.onchange = () => {
         item.ganho = ganhoCheckbox.checked;
         updateTotalsAndSave();
     };
     ganhoLabel.appendChild(ganhoCheckbox);
     ganhoLabel.appendChild(document.createTextNode('Ganhei'));
-    li.appendChild(checkbox);
-    li.appendChild(span);
-    li.appendChild(priceInput);
-    li.appendChild(ganhoLabel);
+    
+    controlsPart.appendChild(priceInput);
+    controlsPart.appendChild(ganhoLabel);
+
+    li.appendChild(mainPart);
+    li.appendChild(controlsPart);
+
     return li;
 }
+
 
 function renderAllSections() {
     const container = document.getElementById('sections-container');
@@ -277,7 +295,7 @@ function renderAllSections() {
         const sectionData = state[sectionKey];
         const sectionDiv = document.createElement('div');
         sectionDiv.id = `${sectionKey}-section`;
-        sectionDiv.className = 'card p-6 rounded-xl shadow-md';
+        sectionDiv.className = 'card p-4 sm:p-6 rounded-xl shadow-md';
         const title = document.createElement('h2');
         title.className = 'text-xl sm:text-2xl font-semibold mb-2 section-title border-b-2 pb-3';
         title.textContent = sectionData.title;
@@ -299,7 +317,7 @@ function renderAllSections() {
 
         const ul = document.createElement('ul');
         ul.id = `${sectionKey}-list`;
-        ul.className = 'space-y-2 mt-4';
+        ul.className = 'space-y-4 mt-4';
         sectionData.items.forEach((item) => {
             ul.appendChild(createItemElement(sectionKey, item));
         });
@@ -369,7 +387,6 @@ function calculateTotals() {
 }
 
 function updateProgressBars() {
-    // Main Progress Bar (Rituais)
     let totalRitualItems = 0;
     let checkedRitualItems = 0;
     for (const sectionKey in state) {
@@ -384,7 +401,6 @@ function updateProgressBars() {
     if (mainProgressBar) mainProgressBar.style.width = `${mainPercentage}%`;
     if (mainProgressPercentage) mainProgressPercentage.textContent = `${Math.round(mainPercentage)}%`;
     
-    // Rancho Progress Bar
     const ranchoItems = state.rancho.items;
     const checkedRanchoItems = ranchoItems.filter(item => item.checked).length;
     const ranchoPercentage = ranchoItems.length > 0 ? (checkedRanchoItems / ranchoItems.length) * 100 : 0;
