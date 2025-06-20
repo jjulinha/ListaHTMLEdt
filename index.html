@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Controle de Itens</title>
+<title>Camarinha Obori - Maio/2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     .editable-span {
@@ -19,7 +19,7 @@
         background-color: white;
     }
     .price-input {
-        width: 90px;
+        width: 110px;
         padding: 4px;
         border-radius: 6px;
         text-align: right;
@@ -30,7 +30,7 @@
 <body class="bg-gray-100 p-8">
 
 <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-    <h1 class="text-3xl font-bold mb-4 text-center">Controle de Itens</h1>
+    <h1 class="text-3xl font-bold mb-4 text-center">Camarinha Obori - Maio/2026</h1>
 
     <div id="roupas-section" class="mb-6">
         <h2 class="text-xl font-semibold mb-2">Roupas e Acessórios</h2>
@@ -53,7 +53,7 @@
 </div>
 
 <script>
-const storageKey = 'controleItensV3';
+const storageKey = 'controleItensV4';
 let state = {
     roupas: []
 };
@@ -72,7 +72,7 @@ function loadState() {
 function parseCurrency(value) {
     if (!value) return 0;
     return parseFloat(
-        value.replace(/\./g, '').replace(',', '.')
+        value.replace(/[R$\s.]/g, '').replace(',', '.')
     ) || 0;
 }
 
@@ -105,8 +105,12 @@ function createItemElement(section, item, index) {
     priceInput.className = 'price-input';
     priceInput.placeholder = 'R$ 0,00';
     priceInput.value = item.price;
-    priceInput.addEventListener('input', () => {
-        item.price = priceInput.value;
+    priceInput.addEventListener('input', (e) => {
+        const clean = e.target.value.replace(/[^\d]/g, '');
+        const num = (parseInt(clean) / 100).toFixed(2);
+        const formatted = formatCurrency(num);
+        e.target.value = formatted;
+        item.price = formatted;
         update();
     });
 
