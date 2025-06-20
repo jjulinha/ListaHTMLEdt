@@ -364,7 +364,7 @@
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     setStatus('connecting', 'A ligar à base de dados...');
-                    dbRef = database.ref('checklist-obori/' + user.uid);
+                    dbRef = database.ref('checklist-obori/global');
                     
                     dbRef.on('value', (snapshot) => {
                         const data = snapshot.val();
