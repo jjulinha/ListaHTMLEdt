@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Camarinha Obori - Maio/2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,7 +19,7 @@
     .editable-span:hover { background-color: #eef8f9; }
     .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
     .price-input {
-        width: 110px;
+        width: 100px;
         padding: 4px 8px;
         border-radius: 6px;
         text-align: right;
@@ -38,10 +39,10 @@
     .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
 </style>
 </head>
-<body class="bg-gray-100 p-8">
+<body class="p-4 sm:p-6 md:p-8">
 
-<div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-    <h1 class="text-3xl font-bold mb-4 text-center main-title">Camarinha Obori - Maio/2026</h1>
+<div class="max-w-4xl mx-auto bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-4 text-center main-title">Camarinha Obori - Maio/2026</h1>
 
     <div class="mb-8">
         <div class="flex justify-between mb-1">
@@ -58,20 +59,20 @@
     </div>
 
     <div class="mt-8 bg-green-100 p-4 rounded-lg space-y-2">
-        <div class="flex justify-between font-semibold">
+        <div class="flex justify-between font-semibold text-sm sm:text-base">
             <span>Custo Itens Rituais:</span>
             <span id="total-rituais">R$ 0,00</span>
         </div>
-         <div class="flex justify-between font-semibold">
+         <div class="flex justify-between font-semibold text-sm sm:text-base">
             <span>Custo Rancho:</span>
             <span id="total-rancho">R$ 0,00</span>
         </div>
         <hr class="border-t-2 border-green-300">
-        <div class="flex justify-between font-bold text-xl">
+        <div class="flex justify-between font-bold text-lg sm:text-xl">
             <span>CUSTO TOTAL:</span>
             <span id="total-geral">R$ 0,00</span>
         </div>
-        <div class="flex justify-between font-bold text-xl text-blue-600">
+        <div class="flex justify-between font-bold text-lg sm:text-xl text-blue-600">
             <span>TOTAL CONTRIBUIÇÃO (Ganhos):</span>
             <span id="total-contribuicao">R$ 0,00</span>
         </div>
@@ -278,7 +279,7 @@ function renderAllSections() {
         sectionDiv.id = `${sectionKey}-section`;
         sectionDiv.className = 'card p-6 rounded-xl shadow-md';
         const title = document.createElement('h2');
-        title.className = 'text-xl font-semibold mb-2 section-title border-b-2 pb-3';
+        title.className = 'text-xl sm:text-2xl font-semibold mb-2 section-title border-b-2 pb-3';
         title.textContent = sectionData.title;
         sectionDiv.appendChild(title);
         
@@ -378,15 +379,19 @@ function updateProgressBars() {
         }
     }
     const mainPercentage = totalRitualItems > 0 ? (checkedRitualItems / totalRitualItems) * 100 : 0;
-    document.getElementById('main-progress-bar-fill').style.width = `${mainPercentage}%`;
-    document.getElementById('main-progress-percentage').textContent = `${Math.round(mainPercentage)}%`;
+    const mainProgressBar = document.getElementById('main-progress-bar-fill');
+    const mainProgressPercentage = document.getElementById('main-progress-percentage');
+    if (mainProgressBar) mainProgressBar.style.width = `${mainPercentage}%`;
+    if (mainProgressPercentage) mainProgressPercentage.textContent = `${Math.round(mainPercentage)}%`;
     
     // Rancho Progress Bar
     const ranchoItems = state.rancho.items;
     const checkedRanchoItems = ranchoItems.filter(item => item.checked).length;
     const ranchoPercentage = ranchoItems.length > 0 ? (checkedRanchoItems / ranchoItems.length) * 100 : 0;
-    document.getElementById('rancho-progress-bar-fill').style.width = `${ranchoPercentage}%`;
-    document.getElementById('rancho-progress-percentage').textContent = `${Math.round(ranchoPercentage)}%`;
+    const ranchoProgressBar = document.getElementById('rancho-progress-bar-fill');
+    const ranchoProgressPercentage = document.getElementById('rancho-progress-percentage');
+    if(ranchoProgressBar) ranchoProgressBar.style.width = `${ranchoPercentage}%`;
+    if(ranchoProgressPercentage) ranchoProgressPercentage.textContent = `${Math.round(ranchoPercentage)}%`;
 }
 
 function updateTotalsAndSave() {
