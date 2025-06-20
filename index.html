@@ -166,38 +166,11 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const storageKey = 'camarinhaOboriState-vLocalPrice-v3'; 
+            const storageKey = 'camarinhaOboriState-vLocalPrice-v4'; 
             
+            // FIX: Register Service Worker by referencing the sw.js file
             if ('serviceWorker' in navigator) {
-                const serviceWorkerContent = `
-                    const CACHE_NAME = 'camarinha-obori-cache-vFinal-2';
-                    const urlsToCache = ['./', './index.html', './manifest.json', './icone-obori.jpg'];
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-                        );
-                    });
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request).then(response => response || fetch(event.request))
-                        );
-                    });
-                    self.addEventListener('activate', event => {
-                        const cacheWhitelist = [CACHE_NAME];
-                        event.waitUntil(
-                            caches.keys().then(cacheNames => Promise.all(
-                                cacheNames.map(cacheName => {
-                                    if (cacheWhitelist.indexOf(cacheName) === -1) {
-                                        return caches.delete(cacheName);
-                                    }
-                                })
-                            ))
-                        );
-                    });
-                `;
-                const swBlob = new Blob([serviceWorkerContent], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(swBlob);
-                navigator.serviceWorker.register(swUrl)
+                navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('Service worker registered successfully:', reg))
                     .catch(err => console.error('Service worker registration failed:', err));
             }
@@ -263,11 +236,27 @@
                 const li = document.createElement('li');
                 li.className = 'checklist-item flex items-center gap-2';
                 
-                li.innerHTML = `
-                    <input type="checkbox" class="h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0" ${checked ? 'checked' : ''}>
-                    <span contenteditable="true" class="text-gray-800 editable-span">${text}</span>
-                    <input type="number" class="price-input w-24 text-right p-1 rounded-md border-2 bg-transparent" placeholder="R$ 0,00" step="0.01" min="0" value="${price || ''}">
-                `;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = checked;
+                checkbox.className = 'h-5 w-5 rounded border-gray-400 checkbox-color focus:ring-cyan-500 flex-shrink-0';
+                
+                const span = document.createElement('span');
+                span.contentEditable = 'true';
+                span.className = 'text-gray-800 editable-span';
+                span.textContent = text;
+                
+                const priceInput = document.createElement('input');
+                priceInput.type = 'number';
+                priceInput.className = 'price-input w-24 text-right p-1 rounded-md border-2 bg-transparent';
+                priceInput.placeholder = 'R$ 0,00';
+                priceInput.step = '0.01';
+                priceInput.min = '0';
+                priceInput.value = price || '';
+
+                li.appendChild(checkbox);
+                li.appendChild(span);
+                li.appendChild(priceInput);
                 
                 attachEventListeners(li);
                 return li;
