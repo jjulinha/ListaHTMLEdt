@@ -4,59 +4,194 @@
 <meta charset="UTF-8">
 <title>Camarinha Obori - Maio/2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-    .editable-span {
-        cursor: text;
-        padding: 4px 8px;
-        border-radius: 6px;
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F5F2E8; 
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23BDE0E1' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
-    .editable-span:hover {
-        background-color: #eef8f9;
-    }
-    .editable-span:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px #5daeb5;
-        background-color: white;
-    }
+    .checklist-item { display: flex; align-items: center; gap: 0.5rem; }
+    .checklist-item input:checked + span { text-decoration: line-through; color: #6b7280; }
+    .progress-bar-fill { transition: width 0.5s ease-in-out; }
+    .editable-span { cursor: text; flex-grow: 1; padding: 4px 8px; border-radius: 6px; }
+    .editable-span:hover { background-color: #eef8f9; }
+    .editable-span:focus { outline: none; box-shadow: 0 0 0 2px #5daeb5; background-color: white; }
     .price-input {
         width: 110px;
-        padding: 4px;
+        padding: 4px 8px;
         border-radius: 6px;
         text-align: right;
         border: 1px solid #ccc;
+        font-family: monospace;
     }
+    .card { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .main-title { color: #0E4249; }
+    .subtitle { color: #3E6064; }
+    .progress-bar-main { background-color: #5daeb5; }
+    .progress-bg-main { background-color: #cbeef1; }
+    .progress-text-main { color: #0E4249; }
+    .section-title { color: #0E4249; border-bottom-color: #cbeef1; }
+    .add-button { background-color: #257b84; color: white; transition: background-color 0.2s; }
+    .add-button:hover { background-color: #1a6d77; }
+    .add-input { border-color: #cbeef1; }
+    .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
 </style>
 </head>
 <body class="bg-gray-100 p-8">
 
 <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
-    <h1 class="text-3xl font-bold mb-4 text-center">Camarinha Obori - Maio/2026</h1>
+    <h1 class="text-3xl font-bold mb-4 text-center main-title">Camarinha Obori - Maio/2026</h1>
 
-    <div id="roupas-section" class="mb-6">
-        <h2 class="text-xl font-semibold mb-2">Roupas e Acessórios</h2>
-        <ul id="roupas-list" class="space-y-2"></ul>
-        <div class="flex mt-2">
-            <input id="roupas-new-item" type="text" placeholder="Adicionar item..." class="flex-grow p-2 border rounded-l-md">
-            <button onclick="addItem('roupas')" class="bg-blue-500 text-white px-4 rounded-r-md">+</button>
+    <div class="mb-8">
+        <div class="flex justify-between mb-1">
+            <span class="text-base font-medium progress-text-main">Progresso Itens Rituais</span>
+            <span id="main-progress-percentage" class="text-sm font-medium progress-text-main">0%</span>
+        </div>
+        <div class="w-full progress-bg-main rounded-full h-4">
+            <div id="main-progress-bar-fill" class="progress-bar-main h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
         </div>
     </div>
-
-    <div class="bg-blue-100 p-4 rounded-lg mb-4">
-        <p class="font-semibold">Total da Sessão: <span id="roupas-total">R$ 0,00</span></p>
-        <p class="font-semibold">Total Contribuição (Ganhos): <span id="roupas-contribuicao">R$ 0,00</span></p>
+    
+    <div id="sections-container" class="space-y-6">
+        <!-- As seções serão geradas aqui pelo JavaScript -->
     </div>
 
-    <div class="bg-green-200 p-4 rounded-lg">
-        <p class="font-bold text-xl">TOTAL GERAL: <span id="total-geral">R$ 0,00</span></p>
-        <p class="font-bold text-xl">TOTAL CONTRIBUIÇÃO: <span id="total-contribuicao">R$ 0,00</span></p>
+    <div class="mt-8 bg-green-100 p-4 rounded-lg space-y-2">
+        <div class="flex justify-between font-semibold">
+            <span>Custo Itens Rituais:</span>
+            <span id="total-rituais">R$ 0,00</span>
+        </div>
+         <div class="flex justify-between font-semibold">
+            <span>Custo Rancho:</span>
+            <span id="total-rancho">R$ 0,00</span>
+        </div>
+        <hr class="border-t-2 border-green-300">
+        <div class="flex justify-between font-bold text-xl">
+            <span>CUSTO TOTAL:</span>
+            <span id="total-geral">R$ 0,00</span>
+        </div>
+        <div class="flex justify-between font-bold text-xl text-blue-600">
+            <span>TOTAL CONTRIBUIÇÃO (Ganhos):</span>
+            <span id="total-contribuicao">R$ 0,00</span>
+        </div>
     </div>
 </div>
 
 <script>
-const storageKey = 'controleItensV4';
-let state = {
-    roupas: []
+const storageKey = 'controleItensV8';
+let state = {};
+
+const defaultState = {
+    "roupas": {
+        title: "Roupas e Acessórios",
+        isRitual: true,
+        items: [
+            { text: '05 cuecas ou calcinhas brancas', checked: false, price: 0, ganho: false },
+            { text: '04 lenços brancos', checked: false, price: 0, ganho: false },
+            { text: '04 toalhinhas para o banco', checked: false, price: 0, ganho: false },
+            { text: '04 lençóis brancos (80x80)', checked: false, price: 0, ganho: false },
+            { text: '03 fronhas brancas', checked: false, price: 0, ganho: false },
+            { text: '02 sutiãs', checked: false, price: 0, ganho: false },
+            { text: '02 jalecos ou camisetas brancas', checked: false, price: 0, ganho: false },
+            { text: '02 calças brancas', checked: false, price: 0, ganho: false },
+            { text: '02 lenços pequenos para tapar os olhos', checked: false, price: 0, ganho: false },
+            { text: '01 traje completo para saída de branco', checked: false, price: 0, ganho: false },
+            { text: '01 quepe para saída ou turbante', checked: false, price: 0, ganho: false },
+            { text: '01 boné', checked: false, price: 0, ganho: false },
+            { text: '01 chinelo branco', checked: false, price: 0, ganho: false },
+            { text: '01 punhal para coração', checked: false, price: 0, ganho: false },
+            { text: '01 pente branco', checked: false, price: 0, ganho: false }
+        ]
+    },
+    "rituais": {
+        title: "Itens para Rituais e Oferendas",
+        isRitual: true,
+        items: [
+            { text: '07 Velas de Cera Grande', checked: false, price: 0, ganho: false },
+            { text: '03 Alguidares Médios', checked: false, price: 0, ganho: false },
+            { text: '02 potes/vidros de Mel', checked: false, price: 0, ganho: false },
+            { text: '02 Sabões de Coco', checked: false, price: 0, ganho: false },
+            { text: '01 Caixa e 02 Velas de 7 Dias', checked: false, price: 0, ganho: false },
+            { text: '21 unidades de Quiabo', checked: false, price: 0, ganho: false },
+            { text: '05 panos de 1 metro', checked: false, price: 0, ganho: false },
+            { text: '05 limões', checked: false, price: 0, ganho: false },
+            { text: '05 ramos de Trigo', checked: false, price: 0, ganho: false },
+            { text: '04 ovos brancos', checked: false, price: 0, ganho: false },
+            { text: '03 maços de vela nº 5', checked: false, price: 0, ganho: false },
+            { text: '03 cigarros para Pompo Gira', checked: false, price: 0, ganho: false },
+            { text: '02 suportes para vela sete dias', checked: false, price: 0, ganho: false },
+            { text: '02 bifes grandes sem passar na máquina', checked: false, price: 0, ganho: false },
+            { text: '01 vidro de azeite de Dendê', checked: false, price: 0, ganho: false },
+            { text: '01 kg de farinha de mandioca', checked: false, price: 0, ganho: false },
+            { text: '01 charruto para Exu', checked: false, price: 0, ganho: false },
+            { text: '01 cápsula de pimenta da Costa', checked: false, price: 0, ganho: false },
+            { text: '01 cacho de uva Itália', checked: false, price: 0, ganho: false },
+            { text: '01 pacote de canjica', checked: false, price: 0, ganho: false },
+            { text: '01 champanhe de Oxalá', checked: false, price: 0, ganho: false },
+            { text: '01 cachaça para Exu', checked: false, price: 0, ganho: false },
+            { text: '01 champanhe para Pompo Gira', checked: false, price: 0, ganho: false },
+            { text: '01 taça para Pombo Gira', checked: false, price: 0, ganho: false },
+            { text: '01 pacote de banha de Ori', checked: false, price: 0, ganho: false },
+            { text: '01 defumador espiritual', checked: false, price: 0, ganho: false },
+            { text: '01 semente de Obi', checked: false, price: 0, ganho: false },
+            { text: '01 semente de Orobo', checked: false, price: 0, ganho: false },
+            { text: '01 pemba branca', checked: false, price: 0, ganho: false },
+            { text: 'Coco ralado', checked: false, price: 0, ganho: false }
+        ]
+    },
+    "gerais": {
+        title: "Materiais Gerais",
+        isRitual: true,
+        items: [
+            { text: '04 Copos Grandes de Vidro', checked: false, price: 0, ganho: false },
+            { text: '08 latas de óleo', checked: false, price: 0, ganho: false },
+            { text: '03 caixas de lamparinas São Jorge', checked: false, price: 0, ganho: false },
+            { text: '02 caixas de fósforo', checked: false, price: 0, ganho: false },
+            { text: '01 quartinha de barro (20 cm)', checked: false, price: 0, ganho: false },
+            { text: '01 prato branco', checked: false, price: 0, ganho: false },
+            { text: '01 colher', checked: false, price: 0, ganho: false },
+            { text: '01 xícara com pires branco', checked: false, price: 0, ganho: false },
+            { text: '01 presto barba', checked: false, price: 0, ganho: false },
+            { text: '01 esteira', checked: false, price: 0, ganho: false }
+        ]
+    },
+     "criacao": {
+        title: "Criação",
+        isRitual: true,
+        items: [
+            { text: '01 pombo branco', checked: false, price: 0, ganho: false }
+        ]
+    },
+    "rancho": {
+        title: "Rancho da Semana",
+        isRitual: false,
+        items: [ { "text": "2 KG DE ARROZ AMARELO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE ARROZ BRANCO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE AÇÚCAR", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE TRIGO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MACARRÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 AZEITE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CANJICA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG FARINHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG FEIJÃO VERMELHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAFÉ", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE LEITE (12 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 BANDEJA DE OVOS (30 UNID.)", "checked": false, "price": 0, "ganho": false }, { "text": "1 QUEIJO RALADO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LEITE CONDENSADO", "checked": false, "price": 0, "ganho": false }, { "text": "6 CREME DE LEITE", "checked": false, "price": 0, "ganho": false }, { "text": "4 KG DE SAL", "checked": false, "price": 0, "ganho": false }, { "text": "8 REFRIGERANTE", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE PAPEL TOALHA", "checked": false, "price": 0, "ganho": false }, { "text": "4 PACOTES DE BOLACHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE COCO RALADO DE 100G CADA", "checked": false, "price": 0, "ganho": false }, { "text": "1 MASSA DE TOMATE ELEFANTE MÉDIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VIDRO DE LEITE DE COCO", "checked": false, "price": 0, "ganho": false }, { "text": "10 SUCOS", "checked": false, "price": 0, "ganho": false }, { "text": "1 TEMPERO VERDE A VONTADE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CEBOLA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE TOMATE", "checked": false, "price": 0, "ganho": false }, { "text": "3 KG DE BATATA", "checked": false, "price": 0, "ganho": false }, { "text": "VERDURAS DA SUA PREFERENCIA", "checked": false, "price": 0, "ganho": false }, { "text": "FRUTAS A GOSTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 MARGARINA QUALLY", "checked": false, "price": 0, "ganho": false }, { "text": "1 NATA", "checked": false, "price": 0, "ganho": false }, { "text": "1 REQUEIJÃO DE 400G", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE QUEIJO", "checked": false, "price": 0, "ganho": false }, { "text": "400G DE PRESUNTO", "checked": false, "price": 0, "ganho": false }, { "text": "1 CALDO DE FRANGO GRANDE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE MOÍDA", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE BIFE", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE CARNE PARA ASSAR DE PANELA", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE COXA E SOBRECOXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA CALABRESA", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE LINGUIÇA PARA CHURRASCO", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE FILÉ DE PEIXE", "checked": false, "price": 0, "ganho": false }, { "text": "1 KG DE CAMARÃO SEM CASCA", "checked": false, "price": 0, "ganho": false }, { "text": "1 VASSOURA", "checked": false, "price": 0, "ganho": false }, { "text": "1 RODO DE CHÃO", "checked": false, "price": 0, "ganho": false }, { "text": "6 PANO DE PRATO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LITRO ÁGUA SANITÁRIA", "checked": false, "price": 0, "ganho": false }, { "text": "1 AMACIANTE DE 2 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "2 PACOTES DE ESPONJA DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE BOMBRIL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PALHA DE AÇO", "checked": false, "price": 0, "ganho": false }, { "text": "15 CREME DENTAL", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 100 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "1 PACOTE DE LIXO DE 30 LITROS", "checked": false, "price": 0, "ganho": false }, { "text": "6 DETERGENTE DE LOUÇA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE SABÃO EM PÓ (OMO, BRILHANTE OU TIXAN)", "checked": false, "price": 0, "ganho": false }, { "text": "1 CX DE VELAS", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE MILHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 LATA DE ERVILHA", "checked": false, "price": 0, "ganho": false }, { "text": "1 CEBOLA ROXA", "checked": false, "price": 0, "ganho": false }, { "text": "1 COMINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 POTE DE ALHO", "checked": false, "price": 0, "ganho": false }, { "text": "2 KG DE FEIJÃO FRADINHO", "checked": false, "price": 0, "ganho": false }, { "text": "1 BOMBONAS DE ÁGUA", "checked": false, "price": 0, "ganho": false }, { "text": "200 COPOS DESCARTÁVEIS 200ML", "checked": false, "price": 0, "ganho": false }, { "text": "ÁGUA 1 FARDO DIVIDIR ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false }, { "text": "2 BOTIJÃO DE GÁS DIVIDIDO ENTRE OS DEITADOS", "checked": false, "price": 0, "ganho": false } ]
+    }
 };
+
+function formatCurrencyForDisplay(value) {
+    if (isNaN(value) || value === null || value === 0) {
+        return "R$ 0,00";
+    }
+    return `R$ ${value.toFixed(2).replace('.', ',')}`;
+}
+
+function formatCurrencyForInput(value) {
+    if (isNaN(value) || value === null || value === 0) {
+        return "";
+    }
+    return value.toFixed(2).replace('.', ',');
+}
+
+function parseCurrency(stringValue) {
+    if (!stringValue || typeof stringValue !== 'string') {
+        return 0;
+    }
+    const numberString = stringValue.replace("R$", "").trim().replace(/\./g, '').replace(',', '.');
+    const value = parseFloat(numberString);
+    return isNaN(value) ? 0 : value;
+}
 
 function saveState() {
     localStorage.setItem(storageKey, JSON.stringify(state));
@@ -65,138 +200,210 @@ function saveState() {
 function loadState() {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
-        state = JSON.parse(saved);
+        const parsedState = JSON.parse(saved);
+        if(parsedState && typeof parsedState === 'object' && Object.keys(parsedState).length > 0) {
+            state = parsedState;
+        } else {
+            state = defaultState;
+        }
+    } else {
+        state = defaultState;
+    }
+    for (const sectionKey in state) {
+        if(Array.isArray(state[sectionKey].items)){
+            state[sectionKey].items.forEach(item => {
+                item.price = parseFloat(item.price) || 0;
+            });
+        }
     }
 }
 
-function parseCurrency(value) {
-    if (!value) return 0;
-    return parseFloat(
-        value.replace(/[R$\s.]/g, '').replace(',', '.')
-    ) || 0;
-}
-
-function formatCurrency(value) {
-    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-function createItemElement(section, item, index) {
+function createItemElement(sectionKey, item) {
     const li = document.createElement('li');
     li.className = 'flex items-center gap-2';
-
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.checked = item.checked;
-    checkbox.addEventListener('change', () => {
+    checkbox.onchange = () => {
         item.checked = checkbox.checked;
-        update();
-    });
-
+        updateTotalsAndSave();
+    };
     const span = document.createElement('span');
     span.contentEditable = true;
     span.className = 'editable-span flex-grow';
     span.textContent = item.text;
-    span.addEventListener('input', () => {
+    span.onblur = () => {
         item.text = span.textContent;
-    });
-
+        saveState();
+    };
     const priceInput = document.createElement('input');
     priceInput.type = 'text';
     priceInput.className = 'price-input';
     priceInput.placeholder = 'R$ 0,00';
-    priceInput.value = item.price;
-    priceInput.addEventListener('input', (e) => {
-        const clean = e.target.value.replace(/[^\d]/g, '');
-        const num = (parseInt(clean) / 100).toFixed(2);
-        const formatted = formatCurrency(num);
-        e.target.value = formatted;
-        item.price = formatted;
-        update();
-    });
-
+    priceInput.value = formatCurrencyForDisplay(item.price);
+    priceInput.onfocus = (e) => {
+        e.target.value = formatCurrencyForInput(item.price);
+    };
+    priceInput.onblur = (e) => {
+        const numericValue = parseCurrency(e.target.value);
+        item.price = numericValue;
+        e.target.value = formatCurrencyForDisplay(numericValue);
+        updateTotalsAndSave();
+    };
+    const ganhoLabel = document.createElement('label');
+    ganhoLabel.className = 'text-sm cursor-pointer flex items-center gap-1';
     const ganhoCheckbox = document.createElement('input');
     ganhoCheckbox.type = 'checkbox';
     ganhoCheckbox.checked = item.ganho;
     ganhoCheckbox.title = 'Ganhei';
-    ganhoCheckbox.addEventListener('change', () => {
+    ganhoCheckbox.onchange = () => {
         item.ganho = ganhoCheckbox.checked;
-        update();
-    });
-
-    const ganhoLabel = document.createElement('label');
-    ganhoLabel.textContent = 'Ganhei';
-    ganhoLabel.className = 'text-sm';
-
+        updateTotalsAndSave();
+    };
+    ganhoLabel.appendChild(ganhoCheckbox);
+    ganhoLabel.appendChild(document.createTextNode('Ganhei'));
     li.appendChild(checkbox);
     li.appendChild(span);
     li.appendChild(priceInput);
-    li.appendChild(ganhoCheckbox);
     li.appendChild(ganhoLabel);
-
     return li;
 }
 
-function renderSection(section) {
-    const list = document.getElementById(`${section}-list`);
-    list.innerHTML = '';
-    state[section].forEach((item, index) => {
-        const li = createItemElement(section, item, index);
-        list.appendChild(li);
-    });
+function renderAllSections() {
+    const container = document.getElementById('sections-container');
+    container.innerHTML = '';
+    for (const sectionKey in state) {
+        const sectionData = state[sectionKey];
+        const sectionDiv = document.createElement('div');
+        sectionDiv.id = `${sectionKey}-section`;
+        sectionDiv.className = 'card p-6 rounded-xl shadow-md';
+        const title = document.createElement('h2');
+        title.className = 'text-xl font-semibold mb-2 section-title border-b-2 pb-3';
+        title.textContent = sectionData.title;
+        sectionDiv.appendChild(title);
+        
+        if (sectionKey === 'rancho') {
+            const progressBarHTML = `
+                <div class="mb-6 mt-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-base font-medium progress-text-main">Progresso do Rancho</span>
+                        <span id="rancho-progress-percentage" class="text-sm font-medium progress-text-main">0%</span>
+                    </div>
+                    <div class="w-full progress-bg-main rounded-full h-4">
+                        <div id="rancho-progress-bar-fill" class="progress-bar-main h-4 rounded-full progress-bar-fill" style="width: 0%"></div>
+                    </div>
+                </div>`;
+            sectionDiv.insertAdjacentHTML('beforeend', progressBarHTML);
+        }
+
+        const ul = document.createElement('ul');
+        ul.id = `${sectionKey}-list`;
+        ul.className = 'space-y-2 mt-4';
+        sectionData.items.forEach((item) => {
+            ul.appendChild(createItemElement(sectionKey, item));
+        });
+        sectionDiv.appendChild(ul);
+
+        const addFormDiv = document.createElement('div');
+        addFormDiv.className = 'flex mt-4';
+        const addInput = document.createElement('input');
+        addInput.id = `${sectionKey}-new-item`;
+        addInput.type = 'text';
+        addInput.placeholder = 'Adicionar item...';
+        addInput.className = 'flex-grow p-2 border rounded-l-md add-input';
+        const addButton = document.createElement('button');
+        addButton.textContent = '+';
+        addButton.className = 'bg-blue-500 text-white px-4 rounded-r-md add-button';
+        addButton.onclick = () => addItem(sectionKey);
+        addFormDiv.appendChild(addInput);
+        addFormDiv.appendChild(addButton);
+        sectionDiv.appendChild(addFormDiv);
+        
+        container.appendChild(sectionDiv);
+    }
 }
 
-function addItem(section) {
-    const input = document.getElementById(`${section}-new-item`);
+function addItem(sectionKey) {
+    const input = document.getElementById(`${sectionKey}-new-item`);
     const text = input.value.trim();
     if (text) {
-        state[section].push({ text, checked: false, price: '', ganho: false });
+        state[sectionKey].items.push({ text, checked: false, price: 0, ganho: false });
         input.value = '';
         update();
     }
 }
 
 function calculateTotals() {
-    let totalGeral = 0;
-    let totalContribuicao = 0;
+    let custoRituais = 0;
+    let contribuicaoRituais = 0;
+    let custoRancho = 0;
+    let contribuicaoRancho = 0;
 
-    ['roupas'].forEach(section => {
-        let total = 0;
-        let contribuicao = 0;
-        state[section].forEach(item => {
-            const price = parseCurrency(item.price);
-            if (item.ganho) {
-                contribuicao += price;
-            } else {
-                total += price;
+    for (const sectionKey in state) {
+        state[sectionKey].items.forEach(item => {
+            const price = item.price || 0;
+            if (state[sectionKey].isRitual) {
+                if (item.ganho) {
+                    contribuicaoRituais += price;
+                } else {
+                    custoRituais += price;
+                }
+            } else { // It's rancho
+                if (item.ganho) {
+                    contribuicaoRancho += price;
+                } else {
+                    custoRancho += price;
+                }
             }
         });
+    }
 
-        document.getElementById(`${section}-total`).textContent = formatCurrency(total);
-        document.getElementById(`${section}-contribuicao`).textContent = formatCurrency(contribuicao);
+    const custoTotalGeral = custoRituais + custoRancho;
+    const contribuicaoTotalGeral = contribuicaoRituais + contribuicaoRancho;
 
-        totalGeral += total;
-        totalContribuicao += contribuicao;
-    });
-
-    document.getElementById('total-geral').textContent = formatCurrency(totalGeral);
-    document.getElementById('total-contribuicao').textContent = formatCurrency(totalContribuicao);
+    document.getElementById('total-rituais').textContent = formatCurrencyForDisplay(custoRituais);
+    document.getElementById('total-rancho').textContent = formatCurrencyForDisplay(custoRancho);
+    document.getElementById('total-geral').textContent = formatCurrencyForDisplay(custoTotalGeral);
+    document.getElementById('total-contribuicao').textContent = formatCurrencyForDisplay(contribuicaoTotalGeral);
 }
 
-function update() {
-    renderSection('roupas');
+function updateProgressBars() {
+    // Main Progress Bar (Rituais)
+    let totalRitualItems = 0;
+    let checkedRitualItems = 0;
+    for (const sectionKey in state) {
+        if (state[sectionKey].isRitual) {
+            totalRitualItems += state[sectionKey].items.length;
+            checkedRitualItems += state[sectionKey].items.filter(item => item.checked).length;
+        }
+    }
+    const mainPercentage = totalRitualItems > 0 ? (checkedRitualItems / totalRitualItems) * 100 : 0;
+    document.getElementById('main-progress-bar-fill').style.width = `${mainPercentage}%`;
+    document.getElementById('main-progress-percentage').textContent = `${Math.round(mainPercentage)}%`;
+    
+    // Rancho Progress Bar
+    const ranchoItems = state.rancho.items;
+    const checkedRanchoItems = ranchoItems.filter(item => item.checked).length;
+    const ranchoPercentage = ranchoItems.length > 0 ? (checkedRanchoItems / ranchoItems.length) * 100 : 0;
+    document.getElementById('rancho-progress-bar-fill').style.width = `${ranchoPercentage}%`;
+    document.getElementById('rancho-progress-percentage').textContent = `${Math.round(ranchoPercentage)}%`;
+}
+
+function updateTotalsAndSave() {
     calculateTotals();
+    updateProgressBars();
     saveState();
 }
 
-// Inicialização
-loadState();
-if (!state.roupas.length) {
-    state.roupas = [
-        { text: '05 cuecas brancas', checked: false, price: '', ganho: false },
-        { text: '04 lenços brancos', checked: false, price: '', ganho: false }
-    ];
+function update() {
+    renderAllSections();
+    updateTotalsAndSave();
 }
-update();
+
+window.onload = () => {
+    loadState();
+    update();
+};
 </script>
 </body>
 </html>
