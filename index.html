@@ -36,9 +36,6 @@
     .add-button:hover { background-color: #1a6d77; }
     .add-input { border-color: #cbeef1; }
     .add-input:focus { border-color: #5daeb5; box-shadow: 0 0 0 1px #5daeb5; outline: none; }
-    .install-button { background-color: #0E4249; }
-    .install-button:hover { background-color: #1a6d77; }
-    .install-instructions { background-color: #f0fafb; border-color: #cbeef1; }
 </style>
 </head>
 <body class="p-4 sm:p-6 md:p-8">
@@ -77,30 +74,11 @@
             <span id="total-contribuicao" class="font-bold text-lg sm:text-xl text-blue-600 text-right">R$ 0,00</span>
         </div>
     </div>
-
-    <!-- Botão e Instruções de Instalação -->
-    <div class="text-center mt-10">
-        <button id="install-guide-button" class="install-button text-white font-bold py-2 px-6 rounded-lg transition-colors">Como Instalar o App?</button>
-        <div id="install-instructions" class="hidden mt-4 text-left p-4 install-instructions rounded-lg max-w-2xl mx-auto">
-             <h3 class="font-bold text-lg main-title">Para adicionar à sua tela de início:</h3>
-            <p class="mt-2 subtitle"><strong>No Android (Chrome):</strong></p>
-            <ol class="list-decimal list-inside ml-4 subtitle">
-                <li>Toque nos três pontos no canto superior direito do navegador.</li>
-                <li>Selecione a opção "Instalar aplicativo" ou "Adicionar à tela inicial".</li>
-            </ol>
-            <p class="mt-4 subtitle"><strong>No iPhone (Safari):</strong></p>
-            <ol class="list-decimal list-inside ml-4 subtitle">
-                <li>Toque no ícone de Compartilhamento (o quadrado com uma seta para cima).</li>
-                <li>Role para baixo e selecione a opção "Adicionar à Tela de Início".</li>
-                <li>Confirme tocando em "Adicionar".</li>
-            </ol>
-        </div>
-    </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const storageKey = 'controleItensV10';
+    const storageKey = 'controleItensV11';
     let state = {};
 
     const defaultState = {
@@ -220,22 +198,27 @@ function saveState() {
 
 function loadState() {
     const saved = localStorage.getItem(storageKey);
-    if (saved) {
-        const parsedState = JSON.parse(saved);
-        if(parsedState && typeof parsedState === 'object' && Object.keys(parsedState).length > 0) {
+    try {
+        const parsedState = saved ? JSON.parse(saved) : null;
+        if (parsedState && typeof parsedState === 'object' && Object.keys(parsedState).length > 0) {
             state = parsedState;
         } else {
-            state = defaultState;
+            // Se não há estado salvo ou está corrompido, usa o padrão
+            state = JSON.parse(JSON.stringify(defaultState)); // Cópia profunda
         }
-    } else {
-        state = defaultState;
+    } catch (e) {
+        console.error("Erro ao carregar o estado, a usar o estado padrão:", e);
+        state = JSON.parse(JSON.stringify(defaultState)); // Cópia profunda
     }
-    for (const sectionKey in state) {
-        if(state[sectionKey] && Array.isArray(state[sectionKey].items)){
-            state[sectionKey].items.forEach(item => {
-                item.price = parseFloat(item.price) || 0;
-            });
+
+    // Garante que os preços são números e que todas as secções existem
+    for (const sectionKey in defaultState) {
+        if (!state[sectionKey] || !Array.isArray(state[sectionKey].items)) {
+            state[sectionKey] = defaultState[sectionKey];
         }
+        state[sectionKey].items.forEach(item => {
+            item.price = parseFloat(item.price) || 0;
+        });
     }
 }
 
@@ -256,7 +239,7 @@ function createItemElement(sectionKey, item) {
     };
 
     const span = document.createElement('span');
-    span.contentEditable = true;
+    span.contentEditable = 'true';
     span.className = 'editable-span flex-grow ml-2';
     span.textContent = item.text;
     span.onblur = () => {
