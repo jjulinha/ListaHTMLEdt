@@ -1,3 +1,4 @@
+
 // Define o nome e a versão do cache
 const CACHE_NAME = 'camarinha-obori-cache-v1';
 // Lista de ficheiros essenciais para guardar em cache
@@ -37,7 +38,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (!cacheWhitelist.includes(cacheName)) {
             console.log('A apagar cache antigo:', cacheName);
             return caches.delete(cacheName);
           }
