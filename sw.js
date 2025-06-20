@@ -1,14 +1,48 @@
-// firebase-config.js
-const firebaseConfig = {
-  apiKey: "AIzaSyA0kx4Pzqcv1tFQE2MCdBrFqRY0yqCEV7Y",
-  authDomain: "checklist-obori.firebaseapp.com",
-  databaseURL: "https://checklist-obori-default-rtdb.firebaseio.com",
-  projectId: "checklist-obori",
-  storageBucket: "checklist-obori.firebasestorage.app",
-  messagingSenderId: "534593148289",
-  appId: "1:534593148289:web:48ac6258aab4b9225cc480",
-  measurementId: "G-XJMVYE6PHN"
-};
+// Define o nome e a versão do cache
+const CACHE_NAME = 'camarinha-obori-cache-v1';
+// Lista de ficheiros essenciais para guardar em cache
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icone-obori.jpg'
+];
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Evento de instalação: guarda os ficheiros em cache
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Cache aberto e a guardar ficheiros...');
+        return cache.addAll(urlsToCache);
+      })
+  );
+});
+
+// Evento de fetch: serve os ficheiros do cache se estiverem disponíveis
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        // Se o ficheiro estiver em cache, retorna-o. Senão, busca na rede.
+        return response || fetch(event.request);
+      })
+  );
+});
+
+// Evento de ativação: limpa caches antigos
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('A apagar cache antigo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
