@@ -109,30 +109,33 @@
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<!-- Firebase SDKs (versão compatível com a sintaxe do seu guia) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+<script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyA0kx4Pzqcv1tFQE2MCdBrFqRY0yqCEV7Y",
-          authDomain: "checklist-obori.firebaseapp.com",
-          databaseURL: "https://checklist-obori-default-rtdb.firebaseio.com",
-          projectId: "checklist-obori",
-          storageBucket: "checklist-obori.appspot.com",
-          messagingSenderId: "534593148289",
-          appId: "1:534593148289:web:48ac6258aab4b9225cc480",
-          measurementId: "G-XJMVYE6PHN"
+            apiKey: "AIzaSyA0kx4Pzqcv1tFQE2MCdBrFqRY0yqCEV7Y",
+            authDomain: "checklist-obori.firebaseapp.com",
+            databaseURL: "https://checklist-obori-default-rtdb.firebaseio.com",
+            projectId: "checklist-obori",
+            storageBucket: "checklist-obori.appspot.com",
+            messagingSenderId: "534593148289",
+            appId: "1:534593148289:web:48ac6258aab4b9225cc480",
+            measurementId: "G-XJMVYE6PHN"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
         
         let dbRef;
-        let unsubscribe;
         let state = {};
+        let debounceTimer;
 
         const defaultState = {
             "roupas": {
@@ -200,12 +203,12 @@
     }
 
     function saveStateToFirebase() {
-        if (!dbRef || !auth.currentUser) return;
+        if (!dbRef) return;
         clearTimeout(debounceTimer);
         setStatus('saving');
         debounceTimer = setTimeout(async () => {
             try {
-                await setDoc(dbRef, { data: state });
+                await dbRef.set({ data: state });
                 setStatus('connected');
             } catch (error) {
                 console.error("Erro ao guardar o estado:", error);
@@ -219,7 +222,7 @@
         updateProgressBars();
         saveStateToFirebase();
     }
-    
+
     function createItemElement(sectionKey, item) {
         const li = document.createElement('li');
         li.className = 'flex flex-wrap items-center gap-x-2 gap-y-1';
@@ -305,7 +308,6 @@
         const text = input.value.trim();
         if (text) {
             state[sectionKey].items.push({ text, checked: false, price: 0, ganho: false });
-            input.value = '';
             renderAllSections(state);
             saveStateToFirebase();
         }
@@ -318,9 +320,9 @@
             state[sectionKey].items.forEach(item => {
                 const price = item.price || 0;
                 if (state[sectionKey].isRitual) {
-                    item.ganho ? contribuicaoRituais += price : custoRituais += price;
+                   if (item.ganho) { contribuicaoRituais += price; } else { custoRituais += price; }
                 } else {
-                    item.ganho ? contribuicaoRancho += price : custoRancho += price;
+                   if (item.ganho) { contribuicaoRancho += price; } else { custoRancho += price; }
                 }
             });
         }
@@ -352,25 +354,24 @@
             if(text) text.textContent = `${Math.round(ranchoPercentage)}%`;
         }
     }
-
+    
     async function initializeAppLogic() {
-        renderAllSections(defaultState); 
+        renderAllSections(defaultState);
         try {
             setStatus('connecting', 'A autenticar...');
-            await signInAnonymously(auth);
+            await auth.signInAnonymously();
             
-            onAuthStateChanged(auth, (user) => {
+            auth.onAuthStateChanged((user) => {
                 if (user) {
                     setStatus('connecting', 'A ligar à base de dados...');
-                    dbRef = doc(db, "checklist-obori-data", user.uid);
+                    dbRef = database.ref('checklist-obori/' + user.uid);
                     
-                    if (unsubscribe) unsubscribe();
-
-                    unsubscribe = onSnapshot(dbRef, async (docSnap) => {
-                        if (docSnap.exists() && docSnap.data().data) {
-                            renderAllSections(docSnap.data().data);
+                    dbRef.on('value', (snapshot) => {
+                        const data = snapshot.val();
+                        if (data && data.data) {
+                            renderAllSections(data.data);
                         } else {
-                            await setDoc(dbRef, { data: defaultState });
+                            dbRef.set({ data: defaultState });
                             renderAllSections(defaultState); 
                         }
                         setStatus('connected');
