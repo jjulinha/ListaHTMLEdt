@@ -53,7 +53,7 @@
 </div>
 
 <script>
-const storageKey = 'controleItensV2';
+const storageKey = 'controleItensV3';
 let state = {
     roupas: []
 };
@@ -67,6 +67,17 @@ function loadState() {
     if (saved) {
         state = JSON.parse(saved);
     }
+}
+
+function parseCurrency(value) {
+    if (!value) return 0;
+    return parseFloat(
+        value.replace(/\./g, '').replace(',', '.')
+    ) || 0;
+}
+
+function formatCurrency(value) {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 function createItemElement(section, item, index) {
@@ -90,11 +101,9 @@ function createItemElement(section, item, index) {
     });
 
     const priceInput = document.createElement('input');
-    priceInput.type = 'number';
+    priceInput.type = 'text';
     priceInput.className = 'price-input';
     priceInput.placeholder = 'R$ 0,00';
-    priceInput.step = '0.01';
-    priceInput.min = '0';
     priceInput.value = item.price;
     priceInput.addEventListener('input', () => {
         item.price = priceInput.value;
@@ -150,22 +159,23 @@ function calculateTotals() {
         let total = 0;
         let contribuicao = 0;
         state[section].forEach(item => {
-            const price = parseFloat(item.price) || 0;
-            total += price;
+            const price = parseCurrency(item.price);
             if (item.ganho) {
                 contribuicao += price;
+            } else {
+                total += price;
             }
         });
 
-        document.getElementById(`${section}-total`).textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-        document.getElementById(`${section}-contribuicao`).textContent = `R$ ${contribuicao.toFixed(2).replace('.', ',')}`;
+        document.getElementById(`${section}-total`).textContent = formatCurrency(total);
+        document.getElementById(`${section}-contribuicao`).textContent = formatCurrency(contribuicao);
 
         totalGeral += total;
         totalContribuicao += contribuicao;
     });
 
-    document.getElementById('total-geral').textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-    document.getElementById('total-contribuicao').textContent = `R$ ${totalContribuicao.toFixed(2).replace('.', ',')}`;
+    document.getElementById('total-geral').textContent = formatCurrency(totalGeral);
+    document.getElementById('total-contribuicao').textContent = formatCurrency(totalContribuicao);
 }
 
 function update() {
